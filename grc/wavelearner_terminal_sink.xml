@@ -1,0 +1,41 @@
+<?xml version="1.0"?>
+<block>
+  <name>Terminal Sink</name>
+  <key>wavelearner_terminal_sink</key>
+  <category>Wavelearner</category>
+  <import>import wavelearner</import>
+  <make>wavelearner.terminal_sink($input_vlen, $batch_size)</make>
+
+  <param>
+    <name>Input Vector Length</name>
+    <key>input_vlen</key>
+    <value>0</value>
+    <type>int</type>
+  </param>
+  <param>
+    <name>Batch Size</name>
+    <key>batch_size</key>
+    <value>1</value>
+    <type>int</type>
+  </param>
+
+  <sink>
+    <name>in</name>
+    <type>float</type>
+    <vlen>$input_vlen</vlen>
+  </sink>
+
+   <doc>
+Block that writes output to the terminal.
+  Args:
+    input_vlen: Number of input samples for each
+     batch. To get this number, combine all NCHW
+     dimensions (including batch size) by
+     multiplying them together. For example, a
+     16x1x2x2048 batch would have an input_vlen
+     of 65536.
+    batch_size: Batch size to be used for inference.
+     For example, a 16x1x2x2048 would have a
+     batch_size of 16.
+  </doc>
+</block>

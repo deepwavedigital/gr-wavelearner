@@ -1,0 +1,59 @@
+<?xml version="1.0"?>
+<block>
+  <name>Inference</name>
+  <key>wavelearner_inference</key>
+  <category>Wavelearner</category>
+  <import>import wavelearner</import>
+  <make>wavelearner.inference($plan_filepath, $input_vlen, $output_vlen, $batch_size)</make>
+
+  <param>
+    <name>PLAN File</name>
+    <key>plan_filepath</key>
+    <value></value>
+    <type>file_open</type>
+  </param>
+  <param>
+    <name>Input Vector Length</name>
+    <key>input_vlen</key>
+    <value>0</value>
+    <type>int</type>
+  </param>
+  <param>
+    <name>Output Vector Length</name>
+    <key>output_vlen</key>
+    <value>0</value>
+    <type>int</type>
+  </param>
+  <param>
+    <name>Batch Size</name>
+    <key>batch_size</key>
+    <value>1</value>
+    <type>int</type>
+  </param>
+
+  <check>$input_vlen &gt; 0</check>
+  <check>$output_vlen &gt; 0</check>
+  <check>$batch_size &gt; 0</check>
+
+  <sink>
+    <name>in</name>
+    <type>float</type>
+    <vlen>$input_vlen</vlen>
+  </sink>
+
+  <source>
+    <name>out</name>
+    <type>float</type>
+    <vlen>$output_vlen</vlen>
+  </source>
+
+  <doc>
+Block that performs inference using the provided TensorRT PLAN file.
+  Args:
+    plan_filepath: Path to the PLAN file.
+    input_vlen: Number of input samples for each batch. To get this number, combine all NCHW dimensions (including batch size) by multiplying them together. For example, a 16x1x2x2048 batch would have an input_vlen of 65536.
+    output_vlen: Same as input_vlen, except for the output.
+    batch_size: Batch size to be used for inference.
+  </doc>
+
+</block>
