@@ -209,7 +209,7 @@
     </param>
     <param>
       <key>file</key>
-      <value>/home/john/googledrive/software/gr-wavelearner/test/classifier_test.dat</value>
+      <value>./examples/classifier_test.dat</value>
     </param>
     <param>
       <key>_coordinate</key>
@@ -449,7 +449,7 @@
     </param>
     <param>
       <key>plan_filepath</key>
-      <value>/home/john/googledrive/software/gr-wavelearner/test/classifier_test.plan</value>
+      <value>./examples/classifier_test.plan</value>
     </param>
   </block>
   <block>

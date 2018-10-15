@@ -5,7 +5,7 @@
 # Title: Classifier Test
 # Author: Deepwave Digital, Inc
 # Description: Test for Wavelearn Inference Block
-# Generated: Mon Oct 15 10:09:26 2018
+# Generated: Mon Oct 15 11:43:47 2018
 ##################################################
 
 from gnuradio import blocks
@@ -34,11 +34,11 @@ class classifier_test(gr.top_block):
         # Blocks
         ##################################################
         self.wavelearner_terminal_sink_0 = wavelearner.terminal_sink(output_length * batch_size, batch_size)
-        self.wavelearner_inference_0 = wavelearner.inference("/home/john/googledrive/software/gr-wavelearner/test/classifier_test.plan", input_length*batch_size, output_length*batch_size, batch_size)
+        self.wavelearner_inference_0 = wavelearner.inference("./examples/classifier_test.plan", input_length*batch_size, output_length*batch_size, batch_size)
         self.blocks_throttle_0 = blocks.throttle(gr.sizeof_short*1, samp_rate,True)
         self.blocks_stream_to_vector_0 = blocks.stream_to_vector(gr.sizeof_float*1, batch_size*input_length)
         self.blocks_short_to_float_0 = blocks.short_to_float(1, 32768)
-        self.blocks_file_source_0 = blocks.file_source(gr.sizeof_short*1, "/home/john/googledrive/software/gr-wavelearner/test/classifier_test.dat", False)
+        self.blocks_file_source_0 = blocks.file_source(gr.sizeof_short*1, "./examples/classifier_test.dat", False)
 
         ##################################################
         # Connections
