@@ -76,7 +76,21 @@ NVIDIA graphics processing units (GPU).
    $ git clone https://github.com/deepwavedigital/gr-wavelearner.git
    ```
 
-3. Install the OOT Module
+3. This step may not be necessary if installing on the NVIDA Jetson TX2.
+   Check to make sure LD_LIBRARY_PATH and PATH environmental variables are properly set according to
+   your CUDA install. This can typically be accomplished by placing the following at the end of your
+   `.bashrc` file
+   ```
+   # CUDA installation path
+   export LD_LIBRARY_PATH=/usr/local/cuda-9.0/lib64$LD_LIBRARY_PATH
+   export PATH=/usr/local/cuda-9.0/bin:$PATH
+   ```
+   and then run:
+   ```
+   $ source ~/.bashrc
+   ```
+
+4. Install the OOT Module
    ```
    $ cd gr-wavelearner
    $ mkdir build
@@ -85,9 +99,9 @@ NVIDIA graphics processing units (GPU).
    $ make
    $ sudo make install
    $ sudo ldconfig
-   ```
+   ``` 
   
-4. To uninstall gr-wavelearner Blocks from GNU Radio Companion
+5. To uninstall gr-wavelearner Blocks from GNU Radio Companion
    ```
    cd gr-wavelearner/build
    sudo make uninstall
