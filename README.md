@@ -8,9 +8,6 @@ Incorporate Deep Learning into GNU Radio
 
 This software is written by **Deepwave Digital, Inc.** [www.deepwavedigital.com]().
 
-Should you find it useful, please consider a donation to help
-[support the effort](https://www.crowdsupply.com/deepwave-digital/air-t).
-
 
 &nbsp;
 ### Inquiries
@@ -26,29 +23,50 @@ NVIDIA graphics processing units (GPU).
 
 
 &nbsp;
-### Dependencies:
+### Dependencies:     
+  - **TensorRT** (v3.0 to v4.0) [1]
+    - **NVIDIA Jetson TX2** - If using the the NVIDIA Jetson TX2, TensorRT is already included with Jetpack so you may
+      skip this section.
+      
+    - **Computer with GPU card** -  you have two options for this dependency:
+        1. Use the NVIDIA Docker - [TensorRT Release 18.08](https://docs.nvidia.com/deeplearning/sdk/tensorrt-container-release-notes/rel_18.08.html)
+        2. Install TensorRT and its dependenices: CUDA and cuDNN. This package has only been tested
+        with the .deb packages (TensorRT 4.0 + CUDA 9.0). Any other method of installation may work
+        but will require you make sure the software sees all the dependencies.  This software has
+        been tested with the following packages (installed in this order):
+            - [cuda-repo-ubuntu1604-9-0-local_9.0.176-1_amd64.deb](https://developer.nvidia.com/cuda-90-download-archive)
+            - [libcudnn7-dev_7.3.1.20-1+cuda9.0_amd64.deb](https://developer.nvidia.com/rdp/cudnn-download)
+            - [nv-tensorrt-repo-ubuntu1604-cuda9.0-ga-trt4.0.1.6-20180612_1-1_amd64.deb](https://developer.nvidia.com/nvidia-tensorrt-4x-download)
+        
+    - Both TensorRT and gr-wavelearner use C++14. As a result, the OOT modules are
+            compiled with the C++14 standard flag set in CMake.
+
+            
+  - **GNU Radio** (v3.7.9 or newer) [2]
+    - This OOT module was tested with gnuradio-runtime, version 3.7.9 because that is the version
+      available via
+      
+        `$ sudo apt install gnuradio`
   - **SWIG** (v3.0.8 or newer)
     - SWIG does not come with GNU Radio and may not be included with your Linux distribution.
     - Building this package will fail if SWIG is not  installed and you will get an import error
       for the inference block. The easiest way to install SWIG is:
 
-         `$ sudo apt install swig`           
-  - **TensorRT** (v3.0 GA or newer) [1]
-    - Both TensorRT and gr-wavelearner use C++14. As a result, the OOT modules are
-            compiled with the C++14 standard flag set in CMake.
-    - This package has only been tested with TensorRT being installed via the .deb packages. Any
-      other method of installation may work but will require you make sure the software sees all
-      the dependencies. 
-  - **GNU Radio** (v3.7.9 or newer) [2]
+      `$ sudo apt install swig`      
+  - **Doxygen** (Recommended, not required)
+    - Installed via:
+    
+      `$ sudo apt install doxygen`
+    
 
 &nbsp;
 ### Requirments:
-  - NVIDIA GPU that supports TensorRT v3.0 or newer or the NVIDA Tegra TX2
+  - NVIDIA GPU that supports TensorRT v3.0 or newer or the NVIDIA Tegra TX2
 
 
 &nbsp;
 ### Current Blocks
-  - __**Inference**__ - This C++ block uses TensorRT to perform inference. Currently, it assumes one input
+  - __**Inference**__ - This C++ block uses TensorRT to perform inference. It assumes one input
                         and one output node for the network. It requires a TensorRT PLAN file be
                         provided that contains information on what operations should take place.
                         The block currently does not handle complex data types. This is primarily
@@ -58,17 +76,20 @@ NVIDIA graphics processing units (GPU).
                         network will treat it as real. For example, one method is to associate
                         the in-phase and quadrature samples within the network's convolution
                         kernels [3].
+                        
+    **NOTE:** TensorRT plan files are platform specific. This means that a .plan file created on
+              Jetson TX2 (like the one provided in `examples`) may not work on a GTX card. To
+              ensure compatability, make sure you create your .plan file on the platform in which
+              it will be executed.
   
   - __**Terminal Sink**__ - This Python block prints the output of a deep learning classifier
                             to the terminal for debugging and to help the user get up and running
                             quickly.
 
-  - More to come ...
-
 &nbsp;
 ## How to Build and Install gr-wavelearner
 1. Install Dependencies listed above (no seriously, make sure they are installed)
-   - Make sure you can import gnuradio and trt from the same python environment in which you are
+   - Make sure you can import gnuradio and tensorrt from the same python environment in which you are
      installing gr-wavelearner
 
 2. Clone the gr-wavelearner repo
@@ -76,10 +97,10 @@ NVIDIA graphics processing units (GPU).
    $ git clone https://github.com/deepwavedigital/gr-wavelearner.git
    ```
 
-3. This step may not be necessary if installing on the NVIDA Jetson TX2.
+3. This step may not be necessary if installing on the NVIDIA Jetson TX2.
    Check to make sure LD_LIBRARY_PATH and PATH environmental variables are properly set according to
    your CUDA install. This can typically be accomplished by placing the following at the end of your
-   `.bashrc` file
+   `.bashrc` file:
    ```
    # CUDA installation path
    export LD_LIBRARY_PATH=/usr/local/cuda-9.0/lib64$LD_LIBRARY_PATH
@@ -129,6 +150,81 @@ NVIDIA graphics processing units (GPU).
 </p>
 
 
+&nbsp;
+### General Workflow for Creating Applications
+1. Train deep learning model (we suggest TensorFlow)
+2. Export deep learning model to a UFF file
+3. Using TensorRT, optimize the UFF file into a .plan engine file. Note that this stage must
+   be performed on the system in which you are deploying your network.
+4. Load .plan engine file into the `wavelearner.inference` block.
+
+
+
+&nbsp;
+### Troubleshooting
+- The supported dependencies are listed in the table below. There is a good chance other versions
+  will work with gr-wavelearner, but they have not been tested. We welcome any feedback on your
+  successful builds.
+
+| Software  | Versions Tested | Application Notes
+| :---:     | :---:           | :---:               
+| Ubuntu    | 16.04           | 
+| Windows   | 10              | Generally builds, but only limited testing has occurred 
+| Jetpack   | 3.0, 3.3        | 
+| CUDA      | 9.0             |
+| cuDNN     | 7.2, 7.3        |
+| TensorRT  | 3.0, 4.0        | 
+
+
+
+
+
+- If you are having trouble building gr-wavelearner, the first thing to check is the installed
+  version of the NVIDIA dependencies.
+    - Check installed version of **CUDA**:
+      
+      `$ nvcc -V`
+      
+      Should produce something like:
+      ```
+      nvcc: NVIDIA (R) Cuda compiler driverCopyright (c) 2005-2017 NVIDIA Corporation
+      Built on Sun_Nov_19_03:10:15_CST_2017
+      Cuda compilation tools, release 9.0, V9.0.252
+      ````
+      
+      which would be **CUDA v9.0.252**.
+    - Check installed version of **cuDNN**:
+      
+      `$ cat /usr/include/cudnn.h | grep "#define CUDNN_MAJOR" -A 2`
+      
+      Should produce something like:
+      ```
+      #define CUDNN_MAJOR 7
+      #define CUDNN_MINOR 2
+      #define CUDNN_PATCHLEVEL 1
+      ```
+      which would be **cuDNN v7.2.1**
+      
+    - Check installed version of **TensorRT**:
+      
+      `$ dpkg -l | grep TensorRT`
+      
+      Should produce something like:
+      ```
+      ii  graphsurgeon-tf        4.1.2-1+cuda9.0    amd64  GraphSurgeon for TensorRT package
+      ii  libnvinfer-dev         4.1.2-1+cuda9.0    amd64  TensorRT development libraries and headers
+      ii  libnvinfer-samples     4.1.2-1+cuda9.0    amd64  TensorRT samples and documentation
+      ii  libnvinfer4            4.1.2-1+cuda9.0    amd64  TensorRT runtime libraries
+      ii  python-libnvinfer      4.1.2-1+cuda9.0    amd64  Python bindings for TensorRT
+      ii  python-libnvinfer-dev  4.1.2-1+cuda9.0    amd64  Python development package for TensorRT
+      ii  python-libnvinfer-doc  4.1.2-1+cuda9.0    amd64  Documention and samples of python bindings for TensorRT
+      ii  tensorrt               4.0.1.6-1+cuda9.0  amd64  Meta package of TensorRT
+      ii  uff-converter-tf       4.1.2-1+cuda9.0    amd64  UFF converter for TensorRT package
+      ```
+      which would be **TensorRT v4.0.1.6** and **NVInfer v4.1.2**
+
+
+
 
 &nbsp;
 ### Known Issues / Future Enhancements
@@ -157,19 +253,11 @@ NVIDIA graphics processing units (GPU).
    improve performance for PCIe based cards.
 - Performance metrics are always printed to the console. The user may want to
    log these instead or alternatively just ignore them completely.
-- First data that comes out of inference block is garbage. Need to initialize
-   as zeros.
 
 &nbsp;
 ### Tags
-  - Deep Learning
-  - Artificial Intelligence
-  - Machine Learning
-  - TensorRT
-  - GPU
-  - Deepwave Digital
-  - Jetson
-  - GNU Radio
+Deep Learning, Artificial Intelligence, Machine Learning, TensorRT, GPU, Deepwave Digital, 
+AIR-T, Jetson, NVIDIA, GNU Radio
   
 
 &nbsp;
