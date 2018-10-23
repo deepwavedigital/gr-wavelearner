@@ -5,7 +5,7 @@
 # Title: Classifier Test
 # Author: Deepwave Digital, Inc
 # Description: Test for Wavelearn Inference Block
-# Generated: Mon Oct 15 11:43:47 2018
+# Generated: Tue Oct 23 16:32:47 2018
 ##################################################
 
 from gnuradio import blocks
@@ -25,48 +25,48 @@ class classifier_test(gr.top_block):
         ##################################################
         # Variables
         ##################################################
-        self.samp_rate = samp_rate = 25e6
-        self.output_length = output_length = 16
-        self.input_length = input_length = 4096
+        self.output_len = output_len = 16
+        self.input_len = input_len = 4096
+        self.fs = fs = 100e6
         self.batch_size = batch_size = 4
 
         ##################################################
         # Blocks
         ##################################################
-        self.wavelearner_terminal_sink_0 = wavelearner.terminal_sink(output_length * batch_size, batch_size)
-        self.wavelearner_inference_0 = wavelearner.inference("./examples/classifier_test.plan", input_length*batch_size, output_length*batch_size, batch_size)
-        self.blocks_throttle_0 = blocks.throttle(gr.sizeof_short*1, samp_rate,True)
-        self.blocks_stream_to_vector_0 = blocks.stream_to_vector(gr.sizeof_float*1, batch_size*input_length)
-        self.blocks_short_to_float_0 = blocks.short_to_float(1, 32768)
-        self.blocks_file_source_0 = blocks.file_source(gr.sizeof_short*1, "./examples/classifier_test.dat", False)
+        self.wavelearner_terminal_sink_0 = wavelearner.terminal_sink(output_len*batch_size, batch_size)
+        self.type_confert = blocks.short_to_float(1, 32768)
+        self.throttle = blocks.throttle(gr.sizeof_short*1, fs,True)
+        self.source = blocks.file_source(gr.sizeof_short*1, "./examples/classifier_test.dat", False)
+        self.inference = wavelearner.inference("./examples/classifier_test_gtx950M.plan", input_len*batch_size, output_len*batch_size, batch_size)
+        self.buffer0 = blocks.stream_to_vector(gr.sizeof_float*1, batch_size*input_len)
 
         ##################################################
         # Connections
         ##################################################
-        self.connect((self.blocks_file_source_0, 0), (self.blocks_throttle_0, 0))    
-        self.connect((self.blocks_short_to_float_0, 0), (self.blocks_stream_to_vector_0, 0))    
-        self.connect((self.blocks_stream_to_vector_0, 0), (self.wavelearner_inference_0, 0))    
-        self.connect((self.blocks_throttle_0, 0), (self.blocks_short_to_float_0, 0))    
-        self.connect((self.wavelearner_inference_0, 0), (self.wavelearner_terminal_sink_0, 0))    
+        self.connect((self.buffer0, 0), (self.inference, 0))    
+        self.connect((self.inference, 0), (self.wavelearner_terminal_sink_0, 0))    
+        self.connect((self.source, 0), (self.throttle, 0))    
+        self.connect((self.throttle, 0), (self.type_confert, 0))    
+        self.connect((self.type_confert, 0), (self.buffer0, 0))    
 
-    def get_samp_rate(self):
-        return self.samp_rate
+    def get_output_len(self):
+        return self.output_len
 
-    def set_samp_rate(self, samp_rate):
-        self.samp_rate = samp_rate
-        self.blocks_throttle_0.set_sample_rate(self.samp_rate)
+    def set_output_len(self, output_len):
+        self.output_len = output_len
 
-    def get_output_length(self):
-        return self.output_length
+    def get_input_len(self):
+        return self.input_len
 
-    def set_output_length(self, output_length):
-        self.output_length = output_length
+    def set_input_len(self, input_len):
+        self.input_len = input_len
 
-    def get_input_length(self):
-        return self.input_length
+    def get_fs(self):
+        return self.fs
 
-    def set_input_length(self, input_length):
-        self.input_length = input_length
+    def set_fs(self, fs):
+        self.fs = fs
+        self.throttle.set_sample_rate(self.fs)
 
     def get_batch_size(self):
         return self.batch_size
