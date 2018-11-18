@@ -18,16 +18,17 @@
 # Boston, MA 02110-1301, USA.
 
 ########################################################################
-# Find CUDA
+# Find CUDA and TensorRT libraries
 ########################################################################
 find_package(CUDA REQUIRED)
+find_package(TensorRT REQUIRED)
 
 ########################################################################
 # Setup library
 ########################################################################
 include(GrPlatform) #define LIB_SUFFIX
 
-include_directories(${Boost_INCLUDE_DIR} ${CUDA_INCLUDE_DIRS})
+include_directories(${Boost_INCLUDE_DIR} ${CUDA_INCLUDE_DIRS} ${TensorRT_INCLUDE_DIR})
 link_directories(${Boost_LIBRARY_DIRS})
 
 list(APPEND wavelearner_sources
@@ -44,9 +45,10 @@ add_library(gnuradio-wavelearner SHARED ${wavelearner_sources})
 target_link_libraries(gnuradio-wavelearner
                       ${Boost_LIBRARIES}
                       ${GNURADIO_ALL_LIBRARIES}
-                      cuda
-                      nvinfer
-                      ${CUDA_LIBRARIES})
+                      ${TensorRT_LIBRARY}
+                      ${CUDA_CUDA_LIBRARY}   # CUDA Driver API
+                      ${CUDA_CUDART_LIBRARY} # CUDA Runtime API
+	)
 set_target_properties(gnuradio-wavelearner PROPERTIES DEFINE_SYMBOL "gnuradio_wavelearner_EXPORTS")
 
 if(APPLE)
