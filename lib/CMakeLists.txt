@@ -67,24 +67,26 @@ install(TARGETS gnuradio-wavelearner
 )
 
 ########################################################################
-# Build and register unit test
+# Build and register unit test, if CppUnit library is available
 ########################################################################
-include(GrTest)
+if(CPPUNIT_FOUND)
+    include(GrTest)
 
-include_directories(${CPPUNIT_INCLUDE_DIRS})
+    include_directories(${CPPUNIT_INCLUDE_DIRS})
+    link_directories(${CPPUNIT_LIBRARY_DIRS})
 
-list(APPEND test_wavelearner_sources
-    ${CMAKE_CURRENT_SOURCE_DIR}/test_wavelearner.cc
-    ${CMAKE_CURRENT_SOURCE_DIR}/qa_wavelearner.cc
-)
+    list(APPEND test_wavelearner_sources
+        ${CMAKE_CURRENT_SOURCE_DIR}/test_wavelearner.cc
+        ${CMAKE_CURRENT_SOURCE_DIR}/qa_wavelearner.cc
+    )
 
-add_executable(test-wavelearner ${test_wavelearner_sources})
+    add_executable(test-wavelearner ${test_wavelearner_sources})
 
-target_link_libraries(
-  test-wavelearner
-  ${GNURADIO_RUNTIME_LIBRARIES}
-  ${Boost_LIBRARIES}
-  ${CPPUNIT_LIBRARIES}
-  gnuradio-wavelearner
-)
-
+    target_link_libraries(
+        test-wavelearner
+        ${GNURADIO_RUNTIME_LIBRARIES}
+        ${Boost_LIBRARIES}
+        ${CPPUNIT_LIBRARIES}
+        gnuradio-wavelearner
+    )
+endif()

@@ -117,10 +117,6 @@ find_package(Doxygen)
 set(GR_REQUIRED_COMPONENTS RUNTIME PMT)
 find_package(Gnuradio "3.7.2" REQUIRED)
 
-if(NOT CPPUNIT_FOUND)
-    message(FATAL_ERROR "CppUnit required to compile wavelearner")
-endif()
-
 ########################################################################
 # Setup doxygen option
 ########################################################################
@@ -139,13 +135,11 @@ include_directories(
     ${CMAKE_BINARY_DIR}/lib
     ${CMAKE_BINARY_DIR}/include
     ${Boost_INCLUDE_DIRS}
-    ${CPPUNIT_INCLUDE_DIRS}
     ${GNURADIO_ALL_INCLUDE_DIRS}
 )
 
 link_directories(
     ${Boost_LIBRARY_DIRS}
-    ${CPPUNIT_LIBRARY_DIRS}
     ${GNURADIO_RUNTIME_LIBRARY_DIRS}
 )
 
