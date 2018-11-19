@@ -122,7 +122,7 @@ cudaError inference_impl::load_engine(const std::string& plan_filepath) {
     return cudaErrorStartupFailure;
   }
 
-  std::ifstream plan_file(plan_filepath.c_str());
+  std::ifstream plan_file(plan_filepath.c_str(), std::ifstream::binary);
   if (!plan_file.is_open()) {
     wavelearner_logger_.log_error("Failed to open PLAN file.");
     return cudaErrorUnknown;
