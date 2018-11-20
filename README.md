@@ -24,16 +24,16 @@ NVIDIA graphics processing units (GPU).
 
 &nbsp;
 ### Dependencies:     
-  - **TensorRT** (v3.0 to v4.0) [1]
-    - **NVIDIA Jetson TX2** - If using the the NVIDIA Jetson TX2, TensorRT is already included with Jetpack so you may
-      skip this section.
+  - **TensorRT** (v3.0+) [1]
+    - **NVIDIA Jetson TX2** - If using the the NVIDIA Jetson TX2, TensorRT is already included with
+      Jetpack so you may skip this section.
       
     - **Computer with GPU card** -  you have two options for this dependency:
         1. Use the NVIDIA Docker - [TensorRT Release 18.08](https://docs.nvidia.com/deeplearning/sdk/tensorrt-container-release-notes/rel_18.08.html)
-        2. Install TensorRT and its dependenices: CUDA and cuDNN. This package has only been tested
-        with the .deb packages (TensorRT 4.0 + CUDA 9.0). Any other method of installation may work
-        but will require you make sure the software sees all the dependencies.  This software has
-        been tested with the following packages (installed in this order):
+        2. Install TensorRT and its dependenices: CUDA and cuDNN. Most of the testing with this
+           package has occured using the .deb packages (TensorRT 4.0 + CUDA 9.0). Any other method
+           of installation may work but will require you make sure the software sees all the
+           dependencies.  This software has been tested with the following packages (installed in this order):
             - [cuda-repo-ubuntu1604-9-0-local_9.0.176-1_amd64.deb](https://developer.nvidia.com/cuda-90-download-archive)
             - [libcudnn7-dev_7.3.1.20-1+cuda9.0_amd64.deb](https://developer.nvidia.com/rdp/cudnn-download)
             - [nv-tensorrt-repo-ubuntu1604-cuda9.0-ga-trt4.0.1.6-20180612_1-1_amd64.deb](https://developer.nvidia.com/nvidia-tensorrt-4x-download)
@@ -87,7 +87,7 @@ NVIDIA graphics processing units (GPU).
                             quickly.
 
 &nbsp;
-## How to Build and Install gr-wavelearner
+## How to Build and Install gr-wavelearner on Ubuntu
 1. Install Dependencies listed above (no seriously, make sure they are installed)
    - Make sure you can import gnuradio and tensorrt from the same python environment in which you are
      installing gr-wavelearner
@@ -169,11 +169,11 @@ NVIDIA graphics processing units (GPU).
 | Software  | Versions Tested | Application Notes
 | :---:     | :---:           | :---:               
 | Ubuntu    | 16.04           | 
-| Windows   | 10              | Generally builds, but only limited testing has occurred 
+| Windows   | 10              | Tested with TensorRT 5.0
 | Jetpack   | 3.0, 3.3        | 
 | CUDA      | 9.0             |
 | cuDNN     | 7.2, 7.3        |
-| TensorRT  | 3.0, 4.0        | 
+| TensorRT  | 3.0, 4.0, 5.0   | 
 
 
 
