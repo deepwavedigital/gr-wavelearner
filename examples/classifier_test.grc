@@ -209,7 +209,7 @@
     </param>
     <param>
       <key>_coordinate</key>
-      <value>(128, 581)</value>
+      <value>(136, 583)</value>
     </param>
     <param>
       <key>_rotation</key>
@@ -264,7 +264,7 @@
     </param>
     <param>
       <key>_coordinate</key>
-      <value>(408, 550)</value>
+      <value>(416, 554)</value>
     </param>
     <param>
       <key>_rotation</key>
@@ -292,7 +292,7 @@
     </param>
     <param>
       <key>plan_filepath</key>
-      <value>./examples/classifier_test_gtx950M.plan</value>
+      <value>./examples/classifier_test_gtx950M_trt4.plan</value>
     </param>
   </block>
   <block>
@@ -476,7 +476,7 @@
     </param>
     <param>
       <key>_coordinate</key>
-      <value>(736, 571)</value>
+      <value>(736, 573)</value>
     </param>
     <param>
       <key>_rotation</key>

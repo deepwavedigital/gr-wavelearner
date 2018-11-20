@@ -5,7 +5,7 @@
 # Title: Classifier Test
 # Author: Deepwave Digital, Inc
 # Description: Test for Wavelearn Inference Block
-# Generated: Tue Oct 23 16:32:47 2018
+# Generated: Tue Nov 20 11:14:08 2018
 ##################################################
 
 from gnuradio import blocks
@@ -37,7 +37,7 @@ class classifier_test(gr.top_block):
         self.type_confert = blocks.short_to_float(1, 32768)
         self.throttle = blocks.throttle(gr.sizeof_short*1, fs,True)
         self.source = blocks.file_source(gr.sizeof_short*1, "./examples/classifier_test.dat", False)
-        self.inference = wavelearner.inference("./examples/classifier_test_gtx950M.plan", input_len*batch_size, output_len*batch_size, batch_size)
+        self.inference = wavelearner.inference("./examples/classifier_test_gtx950M_trt4.plan", input_len*batch_size, output_len*batch_size, batch_size)
         self.buffer0 = blocks.stream_to_vector(gr.sizeof_float*1, batch_size*input_len)
 
         ##################################################

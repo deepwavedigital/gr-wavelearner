@@ -10,7 +10,10 @@ This folder contains a simple test for the gr-wavelearner package.
   inference using classifier_test.plan, and display the results to the terminal
 - classifier_test.py: Executable Python file produced when executing the classifier_test.grc
                       flowgraph
-  
+
+## Notes:
+- The plan files named with trt4 will likely not work in TensorRT 5.0.
+
 ## Instructions:
 1. Open GNU Radio Companion
 2. Choose *File* -> *Open*
