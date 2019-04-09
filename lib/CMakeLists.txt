@@ -32,6 +32,7 @@ include_directories(${Boost_INCLUDE_DIR} ${CUDA_INCLUDE_DIRS} ${TensorRT_INCLUDE
 link_directories(${Boost_LIBRARY_DIRS})
 
 list(APPEND wavelearner_sources
+    fft_impl.cc
     inference_impl.cc
 )
 
@@ -48,6 +49,7 @@ target_link_libraries(gnuradio-wavelearner
                       ${TensorRT_LIBRARY}
                       ${CUDA_CUDA_LIBRARY}   # CUDA Driver API
                       ${CUDA_CUDART_LIBRARY} # CUDA Runtime API
+                      ${CUDA_CUFFT_LIBRARIES}
 	)
 set_target_properties(gnuradio-wavelearner PROPERTIES DEFINE_SYMBOL "gnuradio_wavelearner_EXPORTS")
 
