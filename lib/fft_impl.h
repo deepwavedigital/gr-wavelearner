@@ -22,10 +22,10 @@
 #define INCLUDED_WAVELEARNER_FFT_IMPL_H
 
 #include <wavelearner/fft.h>
-#include <string>
 #include <cuda.h>
 #include <cuda_runtime_api.h>
 #include <cufft.h>
+#include "cuda_utils.h"
 
 namespace gr {
 namespace wavelearner {
@@ -39,7 +39,7 @@ class fft_impl : public fft {
            gr_vector_void_star& output_items);
 
  private:
-  static const std::string kBlockName;
+  static constexpr auto kBlockName = "fft";
   size_t samples_per_buffer_;
   size_t buffer_size_;
   CUcontext context_;
@@ -47,12 +47,7 @@ class fft_impl : public fft {
   cufftComplex* fft_data_;
   cufftHandle fft_plan_;
   int fft_direction_;
-  void throw_on_cuda_drv_err(const CUresult error_code,
-                             const std::string& description);
-  void throw_on_cuda_rt_err(const cudaError error_code,
-                            const std::string& description);
-  void throw_on_cufft_err(const cufftResult error_code,
-                          const std::string& description);
+  CudaErrorHandler err_handler_;
 };
 
 }  // namespace wavelearner

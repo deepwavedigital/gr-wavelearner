@@ -32,6 +32,7 @@ include_directories(${Boost_INCLUDE_DIR} ${CUDA_INCLUDE_DIRS} ${TensorRT_INCLUDE
 link_directories(${Boost_LIBRARY_DIRS})
 
 list(APPEND wavelearner_sources
+    cuda_utils.cc
     fft_impl.cc
     inference_impl.cc
 )
