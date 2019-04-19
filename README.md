@@ -21,6 +21,7 @@ This out of tree (OOT) module for GNU Radio contains code to provide an interfac
 flowgraph. TensorRT allows for deep learning networks to be optimized for inference operations on an
 NVIDIA graphics processing units (GPU).
 
+For an example of how to use GR-Wavelearner, see our presentation [here](http://www.deepwavedigital.net/slides/GR-Wavelearner_Overview.pdf)
 
 &nbsp;
 ### Dependencies:     
