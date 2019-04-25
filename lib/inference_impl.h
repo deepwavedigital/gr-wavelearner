@@ -23,13 +23,11 @@
 
 #include <wavelearner/inference.h>
 #include <chrono>
-#include <sstream>
-#include <stdexcept>
 #include <string>
 #include <cuda.h>
 #include <cuda_runtime_api.h>
 #include <NvInfer.h>
-#include "wavelearner_logger.h"
+#include "cuda_utils.h"
 
 namespace gr {
 namespace wavelearner {
@@ -44,6 +42,7 @@ class inference_impl : public inference {
            gr_vector_void_star& output_items);
 
  private:
+  static constexpr auto kBlockName = "inference";
   static constexpr int kNumIOPorts = 2;
   static constexpr int kInvalidBindingIndex = -1;
   CUcontext context_;
@@ -62,7 +61,8 @@ class inference_impl : public inference {
   // a batch.
   int total_signal_segments_processed_;
   std::chrono::duration<double> total_work_time_;
-  WavelearnerLogger wavelearner_logger_;
+  TrtLogger trt_logger_;
+  CudaErrorHandler err_handler_;
   
   // Helper functions to load and validate the engine
   cudaError load_engine(const std::string& plan_filepath);
@@ -74,28 +74,6 @@ class inference_impl : public inference {
   size_t get_samples_per_batch(const nvinfer1::Dims& dims) const noexcept;
   
   void print_performance_metrics() const noexcept;
-
-  // Error handling function
-  void throw_due_to_cuda_err(const int error_code, const std::string& operation)
-      const {
-    std::stringstream error_stream;
-    error_stream << "Inference Block failed to " << operation
-        << " (error_code = " << error_code << ").";
-    throw std::runtime_error(error_stream.str());
-  }
-  // Wrapper error handling functions for the different CUDA APIs
-  void throw_on_cuda_drv_err(const CUresult error_code,
-                             const std::string& operation) const {
-    if (error_code != CUDA_SUCCESS) {
-      throw_due_to_cuda_err(static_cast<int>(error_code), operation);
-    }
-  }
-  void throw_on_cuda_rt_err(const cudaError error_code,
-                            const std::string& operation) const {
-    if (error_code != cudaSuccess) {
-      throw_due_to_cuda_err(static_cast<int>(error_code), operation);
-    }
-  }
 };
 
 }  // namespace wavelearner

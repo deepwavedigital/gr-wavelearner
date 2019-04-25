@@ -23,7 +23,6 @@
 #endif
 
 #include "inference_impl.h"
-#include <atomic>
 #include <cstring>
 #include <fstream>
 #include <iostream>
@@ -56,40 +55,35 @@ inference_impl::inference_impl(const std::string& plan_filepath,
       batch_size_(batch_size),
       total_signal_segments_processed_(0),
       total_work_time_(std::chrono::seconds::zero()),
-      wavelearner_logger_(),
+      trt_logger_(),
+      err_handler_(kBlockName),
       gr::sync_block(
-          "inference",
+           kBlockName,
            gr::io_signature::make(1, 1, (sizeof(float) * input_vlen)),
            gr::io_signature::make(1, 1, (sizeof(float) * output_vlen))) {
-  static std::atomic<bool> init_done(false);
-  if (!init_done) {
-    throw_on_cuda_drv_err(cuInit(0), "initialize driver API");
-    init_done = true;
-  }
-
+  err_handler_.throw_on_cuda_drv_err(cuInit(0), "initialize CUDA driver API");
   CUdevice dev;
-  throw_on_cuda_drv_err(cuDeviceGet(&dev, 0), "get CUDA device");
-  static const unsigned int kContextFlags = CU_CTX_SCHED_AUTO | CU_CTX_MAP_HOST;
-  throw_on_cuda_drv_err(cuCtxCreate(&context_, kContextFlags, dev),
-                        "create device context");
+  err_handler_.throw_on_cuda_drv_err(cuDeviceGet(&dev, 0), "get CUDA device");
+  err_handler_.throw_on_cuda_drv_err(
+      cuCtxCreate(&context_, kDefaultCtxFlags, dev),
+      "create device context");
 
-  throw_on_cuda_rt_err(load_engine(plan_filepath), "load TensorRT engine");
-  throw_on_cuda_rt_err(validate_engine(), "validate TensorRT engine");
+  err_handler_.throw_on_cuda_rt_err(load_engine(plan_filepath),
+                                    "load TensorRT engine");
+  err_handler_.throw_on_cuda_rt_err(validate_engine(),
+                                    "validate TensorRT engine");
 
-  throw_on_cuda_rt_err(
-      cudaHostAlloc(
-          reinterpret_cast<void**>(&buffers_[input_binding_index_]),
-          input_buffer_size_,
-          cudaHostAllocMapped),
+  err_handler_.throw_on_cuda_rt_err(
+      cudaHostAlloc(reinterpret_cast<void**>(&buffers_[input_binding_index_]),
+                    input_buffer_size_, cudaHostAllocMapped),
       "allocate input buffer");
-  throw_on_cuda_rt_err(
-      cudaHostAlloc(
-          reinterpret_cast<void**>(&buffers_[output_binding_index_]),
-          output_buffer_size_,
-          cudaHostAllocMapped),
+  err_handler_.throw_on_cuda_rt_err(
+      cudaHostAlloc(reinterpret_cast<void**>(&buffers_[output_binding_index_]),
+                    output_buffer_size_, cudaHostAllocMapped),
       "allocate output buffer");
   
-  throw_on_cuda_drv_err(cuCtxPopCurrent(&context_), "pop context");
+  err_handler_.throw_on_cuda_drv_err(cuCtxPopCurrent(&context_),
+                                     "pop context during init");
 }
 
 inference_impl::~inference_impl() {
@@ -116,15 +110,15 @@ inference_impl::~inference_impl() {
 }
 
 cudaError inference_impl::load_engine(const std::string& plan_filepath) {
-  infer_runtime_ = nvinfer1::createInferRuntime(wavelearner_logger_);
+  infer_runtime_ = nvinfer1::createInferRuntime(trt_logger_);
   if (infer_runtime_ == nullptr) {
-    wavelearner_logger_.log_error("Failed to create inference runtime.");
+    trt_logger_.log_error("Failed to create inference runtime.");
     return cudaErrorStartupFailure;
   }
 
   std::ifstream plan_file(plan_filepath.c_str(), std::ifstream::binary);
   if (!plan_file.is_open()) {
-    wavelearner_logger_.log_error("Failed to open PLAN file.");
+    trt_logger_.log_error("Failed to open PLAN file.");
     return cudaErrorUnknown;
   }
 
@@ -132,7 +126,7 @@ cudaError inference_impl::load_engine(const std::string& plan_filepath) {
   plan_buffer << plan_file.rdbuf();
   if (plan_file.bad() || plan_file.fail()) {
     plan_file.close();
-    wavelearner_logger_.log_error("Failed to read PLAN file.");
+    trt_logger_.log_error("Failed to read PLAN file.");
     return cudaErrorUnknown;
   }
 
@@ -142,7 +136,7 @@ cudaError inference_impl::load_engine(const std::string& plan_filepath) {
                                                   serialized_engine.size(),
                                                   nullptr);
   if (engine_ == nullptr) {
-    wavelearner_logger_.log_error("Failed to deserialize engine.");
+    trt_logger_.log_error("Failed to deserialize engine.");
     return cudaErrorInitializationError;
   }
   
@@ -151,34 +145,34 @@ cudaError inference_impl::load_engine(const std::string& plan_filepath) {
 
 cudaError inference_impl::validate_engine() {
   if (engine_ == nullptr) {
-    wavelearner_logger_.log_error("Attempted to validate NULL engine.");
+    trt_logger_.log_error("Attempted to validate NULL engine.");
     return cudaErrorInitializationError;
   }
 
   if (engine_->getNbBindings() != kNumIOPorts) {
-    wavelearner_logger_.log_error("Engine has invalid number of bindings.");
+    trt_logger_.log_error("Engine has invalid number of bindings.");
     return cudaErrorInvalidValue;
   }
 
   const size_t max_batch_size = static_cast<size_t>(engine_->getMaxBatchSize());
   if (batch_size_ > max_batch_size) {
-    wavelearner_logger_.log_error("Unsupported batch size detected.");
+    trt_logger_.log_error("Unsupported batch size detected.");
     return cudaErrorInvalidValue;
   } else if (batch_size_ != max_batch_size) {
-    wavelearner_logger_.log_warn("Unoptimized batch size detected.");
+    trt_logger_.log_warn("Unoptimized batch size detected.");
   }
 
   for (int i = 0; i < kNumIOPorts; ++i) {
     if (engine_->bindingIsInput(i)) {
       if (input_binding_index_ != kInvalidBindingIndex) {
-        wavelearner_logger_.log_error("Multiple input bindings detected.");
+        trt_logger_.log_error("Multiple input bindings detected.");
         return cudaErrorUnknown;
       } else {
         input_binding_index_ = i;
       }
     } else {
       if (output_binding_index_ != kInvalidBindingIndex) {
-        wavelearner_logger_.log_error("Multiple output bindings detected.");
+        trt_logger_.log_error("Multiple output bindings detected.");
         return cudaErrorUnknown;
       }
       output_binding_index_ = i;
@@ -186,7 +180,7 @@ cudaError inference_impl::validate_engine() {
     // Inputs and outputs are always FP32. For reduced precision inference, the
     // engine performs a conversion under the hood.
     if (engine_->getBindingDataType(i) != nvinfer1::DataType::kFLOAT) {
-      wavelearner_logger_.log_error("Unsupported I/O data type found.");
+      trt_logger_.log_error("Unsupported I/O data type found.");
       return cudaErrorInvalidValue;
     }
   }
@@ -194,7 +188,7 @@ cudaError inference_impl::validate_engine() {
   if ((input_binding_index_ == output_binding_index_) ||
       (input_binding_index_ == kInvalidBindingIndex) ||
       (output_binding_index_ == kInvalidBindingIndex)) {
-    wavelearner_logger_.log_error("Invalid I/O bindings detected.");
+    trt_logger_.log_error("Invalid I/O bindings detected.");
     return cudaErrorUnknown;
   }
 
@@ -202,21 +196,21 @@ cudaError inference_impl::validate_engine() {
       engine_->getBindingDimensions(input_binding_index_));
   const size_t input_size = input_samples * sizeof(float);
   if (input_size != input_buffer_size_) {
-    wavelearner_logger_.log_error("Input size mismatch detected.");
+    trt_logger_.log_error("Input size mismatch detected.");
     return cudaErrorInvalidValue;
   }
   const size_t output_samples = get_samples_per_batch(
       engine_->getBindingDimensions(output_binding_index_));
   const size_t output_size = output_samples * sizeof(float);
   if (output_size != output_buffer_size_) {
-    wavelearner_logger_.log_error("Output size mismatch detected.");
+    trt_logger_.log_error("Output size mismatch detected.");
     return cudaErrorInvalidValue;
   }
 
   // If everything checks out, we build the execution context.
   infer_context_ = engine_->createExecutionContext();
   if (infer_context_ == nullptr) {
-    wavelearner_logger_.log_error("Unable to create TensorRT execution context.");
+    trt_logger_.log_error("Unable to create TensorRT execution context.");
     return cudaErrorInitializationError;
   }
 
@@ -262,20 +256,23 @@ int inference_impl::work(int noutput_items,
                          gr_vector_const_void_star& input_items,
                          gr_vector_void_star& output_items) {
   static std::chrono::time_point<std::chrono::steady_clock> start, end;
-  const float* in = reinterpret_cast<const float*>(input_items[0]);
-  float* out = reinterpret_cast<float*>(output_items[0]);
+  const float* const in = reinterpret_cast<const float* const>(input_items[0]);
+  float* const out = reinterpret_cast<float* const>(output_items[0]);
 
   start = std::chrono::steady_clock::now();
-  throw_on_cuda_drv_err(cuCtxPushCurrent(context_), "push context");
+  err_handler_.throw_on_cuda_drv_err(cuCtxPushCurrent(context_),
+                                     "push context");
   std::memcpy(buffers_[input_binding_index_], in, input_buffer_size_);
 
   if (!infer_context_->execute(batch_size_,
                                reinterpret_cast<void**>(buffers_))) {
-    throw_on_cuda_rt_err(cudaErrorLaunchFailure, "execute inference");
+    err_handler_.throw_on_cuda_rt_err(cudaErrorLaunchFailure,
+                                      "execute inference");
   }
 
   std::memcpy(out, buffers_[output_binding_index_], output_buffer_size_);
-  throw_on_cuda_drv_err(cuCtxPopCurrent(&context_), "pop context");
+  err_handler_.throw_on_cuda_drv_err(cuCtxPopCurrent(&context_),
+                                     "pop context during work()");
   end = std::chrono::steady_clock::now();
 
   std::chrono::duration<double> time_elapsed = end - start;
