@@ -5,8 +5,9 @@
 # Title: Classifier Test
 # Author: Deepwave Digital, Inc
 # Description: Test for Wavelearn Inference Block
-# Generated: Tue Nov 20 11:14:08 2018
+# Generated: Wed Sep 18 16:30:58 2019
 ##################################################
+
 
 from gnuradio import blocks
 from gnuradio import eng_notation
@@ -36,18 +37,18 @@ class classifier_test(gr.top_block):
         self.wavelearner_terminal_sink_0 = wavelearner.terminal_sink(output_len*batch_size, batch_size)
         self.type_confert = blocks.short_to_float(1, 32768)
         self.throttle = blocks.throttle(gr.sizeof_short*1, fs,True)
-        self.source = blocks.file_source(gr.sizeof_short*1, "./examples/classifier_test.dat", False)
-        self.inference = wavelearner.inference("./examples/classifier_test_gtx950M_trt4.plan", input_len*batch_size, output_len*batch_size, batch_size)
+        self.source = blocks.file_source(gr.sizeof_short*1, 'classifier_test.dat', False)
+        self.inference = wavelearner.inference('classifier_test_gtx950M_trt4.plan', False, input_len*batch_size, output_len*batch_size, batch_size)
         self.buffer0 = blocks.stream_to_vector(gr.sizeof_float*1, batch_size*input_len)
 
         ##################################################
         # Connections
         ##################################################
-        self.connect((self.buffer0, 0), (self.inference, 0))    
-        self.connect((self.inference, 0), (self.wavelearner_terminal_sink_0, 0))    
-        self.connect((self.source, 0), (self.throttle, 0))    
-        self.connect((self.throttle, 0), (self.type_confert, 0))    
-        self.connect((self.type_confert, 0), (self.buffer0, 0))    
+        self.connect((self.buffer0, 0), (self.inference, 0))
+        self.connect((self.inference, 0), (self.wavelearner_terminal_sink_0, 0))
+        self.connect((self.source, 0), (self.throttle, 0))
+        self.connect((self.throttle, 0), (self.type_confert, 0))
+        self.connect((self.type_confert, 0), (self.buffer0, 0))
 
     def get_output_len(self):
         return self.output_len

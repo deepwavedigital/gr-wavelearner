@@ -1,6 +1,6 @@
 /* -*- c++ -*- */
 /* 
- * Copyright 2018 Deepwave Digital Inc.
+ * Copyright 2018-2019 Deepwave Digital Inc.
  * 
  * This is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -34,8 +34,9 @@ namespace wavelearner {
 
 class inference_impl : public inference {
  public:
-  inference_impl(const std::string& plan_filepath, const size_t input_vlen,
-                 const size_t output_vlen, const size_t batch_size);
+  inference_impl(const std::string& plan_filepath, const bool complex_input,
+                 const size_t input_vlen, const size_t output_vlen,
+                 const size_t batch_size);
   ~inference_impl();
 
   int work(int noutput_items, gr_vector_const_void_star& input_items,
@@ -68,10 +69,17 @@ class inference_impl : public inference {
   cudaError load_engine(const std::string& plan_filepath);
   cudaError validate_engine();
 
-  // Helper function to combine all the I/O dimensions (i.e., NCHW dimensions)
-  // into a single number, which can then be compared against the vlen
-  // parameters.
-  size_t get_samples_per_batch(const nvinfer1::Dims& dims) const noexcept;
+  // Helper function that converts the vector length set in the GNU Radio
+  // flowgraph to the number of bytes an I/O port expects. Used only in the
+  // constructor, since from that point forward, we only keep track of the
+  // total number of bytes an input or output buffer requires.
+  size_t get_gr_buffer_size(const size_t vlen,
+                            const bool is_complex = false) const noexcept;
+  // Helper function to combine all the I/O dimensions of a TensorRT engine's
+  // input or output binding into a number of bytes (aka. a buffer size).
+  // Used to determine if the engine's parameters and the vector lengths
+  // set in the GNU Radio flowgraph match up.
+  size_t get_trt_binding_size(const nvinfer1::Dims& dims) const noexcept;
   
   void print_performance_metrics() const noexcept;
 };

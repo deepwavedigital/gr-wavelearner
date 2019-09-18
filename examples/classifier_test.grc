@@ -275,6 +275,10 @@
       <value>inference</value>
     </param>
     <param>
+      <key>input_type</key>
+      <value>float</value>
+    </param>
+    <param>
       <key>input_vlen</key>
       <value>input_len*batch_size</value>
     </param>
@@ -292,7 +296,7 @@
     </param>
     <param>
       <key>plan_filepath</key>
-      <value>./examples/classifier_test_gtx950M_trt4.plan</value>
+      <value>classifier_test_gtx950M_trt4.plan</value>
     </param>
   </block>
   <block>
@@ -315,7 +319,7 @@
     </param>
     <param>
       <key>file</key>
-      <value>./examples/classifier_test.dat</value>
+      <value>classifier_test.dat</value>
     </param>
     <param>
       <key>_coordinate</key>

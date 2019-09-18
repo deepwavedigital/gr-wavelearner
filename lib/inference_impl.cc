@@ -1,6 +1,6 @@
 /* -*- c++ -*- */
 /* 
- * Copyright 2018 Deepwave Digital Inc.
+ * Copyright 2018-2019 Deepwave Digital Inc.
  * 
  * This is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -32,14 +32,17 @@ namespace gr {
 namespace wavelearner {
 
 inference::sptr inference::make(const std::string& plan_filepath,
+                                const bool complex_input,
                                 const size_t input_vlen,
                                 const size_t output_vlen,
                                 const size_t batch_size) {
   return gnuradio::get_initial_sptr(
-      new inference_impl(plan_filepath, input_vlen, output_vlen, batch_size));
+      new inference_impl(plan_filepath, complex_input, input_vlen,
+                         output_vlen, batch_size));
 }
 
 inference_impl::inference_impl(const std::string& plan_filepath,
+                               const bool complex_input,
                                const size_t input_vlen,
                                const size_t output_vlen,
                                const size_t batch_size)
@@ -50,8 +53,8 @@ inference_impl::inference_impl(const std::string& plan_filepath,
       buffers_(),
       input_binding_index_(kInvalidBindingIndex),
       output_binding_index_(kInvalidBindingIndex),
-      input_buffer_size_(input_vlen * sizeof(float)),
-      output_buffer_size_(output_vlen * sizeof(float)),
+      input_buffer_size_(get_gr_buffer_size(input_vlen, complex_input)),
+      output_buffer_size_(get_gr_buffer_size(output_vlen)),
       batch_size_(batch_size),
       total_signal_segments_processed_(0),
       total_work_time_(std::chrono::seconds::zero()),
@@ -59,8 +62,8 @@ inference_impl::inference_impl(const std::string& plan_filepath,
       err_handler_(kBlockName),
       gr::sync_block(
            kBlockName,
-           gr::io_signature::make(1, 1, (sizeof(float) * input_vlen)),
-           gr::io_signature::make(1, 1, (sizeof(float) * output_vlen))) {
+           gr::io_signature::make(1, 1, get_gr_buffer_size(input_vlen, complex_input)),
+           gr::io_signature::make(1, 1, get_gr_buffer_size(output_vlen))) {
   err_handler_.throw_on_cuda_drv_err(cuInit(0), "initialize CUDA driver API");
   CUdevice dev;
   err_handler_.throw_on_cuda_drv_err(cuDeviceGet(&dev, 0), "get CUDA device");
@@ -177,8 +180,8 @@ cudaError inference_impl::validate_engine() {
       }
       output_binding_index_ = i;
     }
-    // Inputs and outputs are always FP32. For reduced precision inference, the
-    // engine performs a conversion under the hood.
+    // Inputs and outputs into TRT are always FP32. For reduced precision
+    // inference, the engine performs a conversion under the hood.
     if (engine_->getBindingDataType(i) != nvinfer1::DataType::kFLOAT) {
       trt_logger_.log_error("Unsupported I/O data type found.");
       return cudaErrorInvalidValue;
@@ -192,17 +195,15 @@ cudaError inference_impl::validate_engine() {
     return cudaErrorUnknown;
   }
 
-  const size_t input_samples = get_samples_per_batch(
-      engine_->getBindingDimensions(input_binding_index_));
-  const size_t input_size = input_samples * sizeof(float);
-  if (input_size != input_buffer_size_) {
+  const nvinfer1::Dims input_dims =
+      engine_->getBindingDimensions(input_binding_index_);
+  if (get_trt_binding_size(input_dims) != input_buffer_size_) {
     trt_logger_.log_error("Input size mismatch detected.");
     return cudaErrorInvalidValue;
   }
-  const size_t output_samples = get_samples_per_batch(
-      engine_->getBindingDimensions(output_binding_index_));
-  const size_t output_size = output_samples * sizeof(float);
-  if (output_size != output_buffer_size_) {
+  const nvinfer1::Dims output_dims =
+    engine_->getBindingDimensions(output_binding_index_);
+  if (get_trt_binding_size(output_dims) != output_buffer_size_) {
     trt_logger_.log_error("Output size mismatch detected.");
     return cudaErrorInvalidValue;
   }
@@ -217,19 +218,27 @@ cudaError inference_impl::validate_engine() {
   return cudaSuccess;
 }
 
-size_t inference_impl::get_samples_per_batch(const nvinfer1::Dims& dims)
+size_t inference_impl::get_gr_buffer_size(const size_t vlen, const bool is_complex)
+    const noexcept {
+  const size_t float_vector_size = vlen * sizeof(float);
+  // A complex vector is made up of two floats, where one float is the real
+  // component and the other float is the imaginary component.
+  return is_complex ? (2 * float_vector_size) : float_vector_size;
+}
+
+size_t inference_impl::get_trt_binding_size(const nvinfer1::Dims& dims)
     const noexcept {
   // We start with the batch size, since this is NOT provided via the dims
   // parameter and we need to account for this dimension.
-  size_t num_samples = batch_size_;
+  size_t num_floats = batch_size_;
   for (int i = 0; i < dims.nbDims; ++i) {
     const auto type = dims.type[i];
     if ((type == nvinfer1::DimensionType::kSPATIAL) ||
         (type == nvinfer1::DimensionType::kCHANNEL)) {
-        num_samples *= dims.d[i];
+        num_floats *= dims.d[i];
     }
   }
-  return num_samples;
+  return num_floats * sizeof(float);
 }
 
 void inference_impl::print_performance_metrics() const noexcept {
@@ -256,6 +265,11 @@ int inference_impl::work(int noutput_items,
                          gr_vector_const_void_star& input_items,
                          gr_vector_void_star& output_items) {
   static std::chrono::time_point<std::chrono::steady_clock> start, end;
+  // Even if we have a complex vector, it is safe to cast to a float pointer,
+  // since a complex number in GNU Radio is just two floats in adjacent
+  // memory. Earlier in the constructor, we already accounted for the fact
+  // that (given an equal number of samples) a complex buffer will be twice
+  // the size of a float buffer.
   const float* const in = reinterpret_cast<const float* const>(input_items[0]);
   float* const out = reinterpret_cast<float* const>(output_items[0]);
 

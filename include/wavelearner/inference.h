@@ -1,6 +1,6 @@
 /* -*- c++ -*- */
 /* 
- * Copyright 2018 Deepwave Digital Inc.
+ * Copyright 2018-2019 Deepwave Digital Inc.
  * 
  * This is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -42,6 +42,7 @@ namespace gr {
        * creating new instances.
        */
       static sptr make(const std::string& plan_filepath,
+                       const bool complex_input,
                        const size_t input_vlen,
                        const size_t output_vlen,
                        const size_t batch_size);
