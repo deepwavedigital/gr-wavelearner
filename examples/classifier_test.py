@@ -5,7 +5,7 @@
 # Title: Classifier Test
 # Author: Deepwave Digital, Inc
 # Description: Test for Wavelearn Inference Block
-# Generated: Wed Sep 18 16:30:58 2019
+# Generated: Tue Nov 26 18:01:32 2019
 ##################################################
 
 
@@ -29,6 +29,7 @@ class classifier_test(gr.top_block):
         self.output_len = output_len = 16
         self.input_len = input_len = 4096
         self.fs = fs = 100e6
+        self.data_path = data_path = "/usr/local/src/gr-wavelearner/examples/"
         self.batch_size = batch_size = 4
 
         ##################################################
@@ -37,8 +38,8 @@ class classifier_test(gr.top_block):
         self.wavelearner_terminal_sink_0 = wavelearner.terminal_sink(output_len*batch_size, batch_size)
         self.type_confert = blocks.short_to_float(1, 32768)
         self.throttle = blocks.throttle(gr.sizeof_short*1, fs,True)
-        self.source = blocks.file_source(gr.sizeof_short*1, 'classifier_test.dat', False)
-        self.inference = wavelearner.inference('classifier_test_gtx950M_trt4.plan', False, input_len*batch_size, output_len*batch_size, batch_size)
+        self.source = blocks.file_source(gr.sizeof_short*1, data_path + "classifier_test.dat", False)
+        self.inference = wavelearner.inference(data_path + "classifier_test_tx2_trt4.plan", False, input_len*batch_size, output_len*batch_size, batch_size)
         self.buffer0 = blocks.stream_to_vector(gr.sizeof_float*1, batch_size*input_len)
 
         ##################################################
@@ -68,6 +69,13 @@ class classifier_test(gr.top_block):
     def set_fs(self, fs):
         self.fs = fs
         self.throttle.set_sample_rate(self.fs)
+
+    def get_data_path(self):
+        return self.data_path
+
+    def set_data_path(self, data_path):
+        self.data_path = data_path
+        self.source.open(self.data_path + "classifier_test.dat", False)
 
     def get_batch_size(self):
         return self.batch_size
