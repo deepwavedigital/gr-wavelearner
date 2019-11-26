@@ -2,7 +2,7 @@
 <block>
   <name>Terminal Sink</name>
   <key>wavelearner_terminal_sink</key>
-  <category>Wavelearner</category>
+  <category>[Wavelearner]</category>
   <import>import wavelearner</import>
   <make>wavelearner.terminal_sink($input_vlen, $batch_size)</make>
 

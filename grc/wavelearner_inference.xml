@@ -2,7 +2,7 @@
 <block>
   <name>Inference</name>
   <key>wavelearner_inference</key>
-  <category>Wavelearner</category>
+  <category>[Wavelearner]</category>
   <import>import wavelearner</import>
   <make>wavelearner.inference($plan_filepath, $input_type.is_complex, $input_vlen, $output_vlen, $batch_size)</make>
 

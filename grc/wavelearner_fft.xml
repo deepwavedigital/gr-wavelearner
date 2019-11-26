@@ -2,7 +2,7 @@
 <block>
   <name>FFT</name>
   <key>wavelearner_fft</key>
-  <category>Wavelearner</category>
+  <category>[Wavelearner]</category>
   <import>import wavelearner</import>
   <make>wavelearner.fft($vlen, $fft_size, $direction)</make>
 
