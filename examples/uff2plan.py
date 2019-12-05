@@ -43,7 +43,7 @@ parser.register_input(input_node_name, input_node_dims)
 parser.parse(uff_file_name, network)
 
 builder.max_batch_size = batch_size
-builder.maxworkspace_size = workspace_size
+builder.max_workspace_size = workspace_size
 builder.fp16_mode = use_fp16
 
 engine = builder.build_cuda_engine(network)
