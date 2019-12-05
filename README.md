@@ -21,12 +21,13 @@ This out of tree (OOT) module for GNU Radio contains code to provide an interfac
 flowgraph. TensorRT allows for deep learning networks to be optimized for inference operations on an
 NVIDIA graphics processing units (GPU).
 
-For an example of how to use GR-Wavelearner, see our presentation [here](http://www.deepwavedigital.net/slides/GR-Wavelearner_Overview.pdf)
+For an example of how to use GR-Wavelearner, see our presentation [here](http://www.deepwavedigital.net/slides/GR-Wavelearner_Overview.pdf).
 
 &nbsp;
 ### Dependencies:     
   - **TensorRT** (v3.0+) [1]
-    - **NVIDIA Jetson TX2** - If using the the NVIDIA Jetson TX2, TensorRT is already included with
+    - **AIR-T** - The AIR-T already includes Tensor-RT so you may skip this section.
+    - **NVIDIA Jetson** - If using the the NVIDIA Jetson, TensorRT is already included with
       Jetpack so you may skip this section.
       
     - **Computer with GPU card** -  you have two options for this dependency:
@@ -86,6 +87,8 @@ For an example of how to use GR-Wavelearner, see our presentation [here](http://
   - __**Terminal Sink**__ - This Python block prints the output of a deep learning classifier
                             to the terminal for debugging and to help the user get up and running
                             quickly.
+                            
+  - __**cuFFT**__ - This C++ / CUDA block executes NVIDIA's cuFFT algorithm on an input data vector.
 
 &nbsp;
 ## How to Build and Install gr-wavelearner on Ubuntu
@@ -156,8 +159,11 @@ For an example of how to use GR-Wavelearner, see our presentation [here](http://
 1. Train deep learning model (we suggest TensorFlow)
 2. Export deep learning model to a UFF file
 3. Using TensorRT, optimize the UFF file into a .plan engine file. Note that this stage must
-   be performed on the system in which you are deploying your network.
+   be performed on the system in which you are deploying your network. We provide an example
+   of how to convert a UFF file to a PLAN file in `examples/uff2plan.py`.
 4. Load .plan engine file into the `wavelearner.inference` block.
+5. Update the `batch_size`, `input_length`, and `output_length` to match that of your deep
+   learning model.
 
 
 
@@ -265,9 +271,6 @@ AIR-T, Jetson, NVIDIA, GNU Radio
 ### Credits and License
 GR-WAVELEARNER is designed and written by **Deepwave Digital, Inc.** [www.deepwavedigital.com]()
 and is licensed under the GNU General Public License. Copyright notices at the top of source files.
-
-Should you find it useful, please consider a donation to help
-[support the effort](https://www.crowdsupply.com/deepwave-digital/air-t).
 
 
 &nbsp;
