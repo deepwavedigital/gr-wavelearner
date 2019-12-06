@@ -1,5 +1,5 @@
 <?xml version='1.0' encoding='utf-8'?>
-<?grc format='1' created='3.7.11'?>
+<?grc format='1' created='3.7.9'?>
 <flow_graph>
   <timestamp>Tue Mar  6 18:52:19 2018</timestamp>
   <block>
@@ -58,7 +58,7 @@
     </param>
     <param>
       <key>realtime_scheduling</key>
-      <value>1</value>
+      <value></value>
     </param>
     <param>
       <key>run_command</key>
@@ -66,7 +66,7 @@
     </param>
     <param>
       <key>run_options</key>
-      <value>prompt</value>
+      <value>run</value>
     </param>
     <param>
       <key>run</key>
@@ -105,7 +105,7 @@
     </param>
     <param>
       <key>value</key>
-      <value>128</value>
+      <value>256</value>
     </param>
   </block>
   <block>
@@ -217,6 +217,57 @@
     </param>
   </block>
   <block>
+    <key>blocks_file_sink</key>
+    <param>
+      <key>append</key>
+      <value>False</value>
+    </param>
+    <param>
+      <key>alias</key>
+      <value></value>
+    </param>
+    <param>
+      <key>comment</key>
+      <value></value>
+    </param>
+    <param>
+      <key>affinity</key>
+      <value></value>
+    </param>
+    <param>
+      <key>_enabled</key>
+      <value>True</value>
+    </param>
+    <param>
+      <key>file</key>
+      <value>output.bin</value>
+    </param>
+    <param>
+      <key>_coordinate</key>
+      <value>(656, 199)</value>
+    </param>
+    <param>
+      <key>_rotation</key>
+      <value>0</value>
+    </param>
+    <param>
+      <key>id</key>
+      <value>blocks_file_sink_0</value>
+    </param>
+    <param>
+      <key>type</key>
+      <value>float</value>
+    </param>
+    <param>
+      <key>unbuffered</key>
+      <value>False</value>
+    </param>
+    <param>
+      <key>vlen</key>
+      <value>output_len*batch_size</value>
+    </param>
+  </block>
+  <block>
     <key>blocks_stream_to_vector</key>
     <param>
       <key>alias</key>
@@ -236,7 +287,7 @@
     </param>
     <param>
       <key>_coordinate</key>
-      <value>(272, 228)</value>
+      <value>(240, 220)</value>
     </param>
     <param>
       <key>_rotation</key>
@@ -291,7 +342,7 @@
     </param>
     <param>
       <key>_coordinate</key>
-      <value>(456, 204)</value>
+      <value>(416, 199)</value>
     </param>
     <param>
       <key>_rotation</key>
@@ -329,24 +380,8 @@
   <block>
     <key>soapy_source</key>
     <param>
-      <key>sdrplay_agc_setpoint</key>
-      <value>-30</value>
-    </param>
-    <param>
-      <key>args</key>
-      <value></value>
-    </param>
-    <param>
-      <key>sdrplay_biastee</key>
-      <value>true</value>
-    </param>
-    <param>
       <key>alias</key>
       <value></value>
-    </param>
-    <param>
-      <key>amp_gain0</key>
-      <value>0</value>
     </param>
     <param>
       <key>ant0</key>
@@ -385,10 +420,6 @@
       <value>0</value>
     </param>
     <param>
-      <key>ifgr_gain</key>
-      <value>59</value>
-    </param>
-    <param>
       <key>balance0</key>
       <value>0</value>
     </param>
@@ -401,16 +432,8 @@
       <value>0</value>
     </param>
     <param>
-      <key>nco_freq0</key>
-      <value>0</value>
-    </param>
-    <param>
       <key>pga_gain0</key>
       <value>0</value>
-    </param>
-    <param>
-      <key>rfgr_gain</key>
-      <value>9</value>
     </param>
     <param>
       <key>tia_gain0</key>
@@ -477,10 +500,6 @@
       <value>0</value>
     </param>
     <param>
-      <key>nco_freq1</key>
-      <value>0</value>
-    </param>
-    <param>
       <key>pga_gain1</key>
       <value>0</value>
     </param>
@@ -505,10 +524,6 @@
       <value></value>
     </param>
     <param>
-      <key>sdrplay_dabnotch</key>
-      <value>false</value>
-    </param>
-    <param>
       <key>dev</key>
       <value>"device=SoapyAIRT"</value>
     </param>
@@ -518,7 +533,7 @@
     </param>
     <param>
       <key>_coordinate</key>
-      <value>(40, 196)</value>
+      <value>(16, 199)</value>
     </param>
     <param>
       <key>_rotation</key>
@@ -527,10 +542,6 @@
     <param>
       <key>id</key>
       <value>soapy_source_0</value>
-    </param>
-    <param>
-      <key>sdrplay_if_mode</key>
-      <value>Zero-IF</value>
     </param>
     <param>
       <key>clock_rate</key>
@@ -553,51 +564,8 @@
       <value>fc32</value>
     </param>
     <param>
-      <key>sdrplay_rfnotch</key>
-      <value>false</value>
-    </param>
-    <param>
       <key>samp_rate</key>
       <value>samp_rate</value>
-    </param>
-  </block>
-  <block>
-    <key>wavelearner_terminal_sink</key>
-    <param>
-      <key>batch_size</key>
-      <value>batch_size</value>
-    </param>
-    <param>
-      <key>alias</key>
-      <value></value>
-    </param>
-    <param>
-      <key>comment</key>
-      <value></value>
-    </param>
-    <param>
-      <key>affinity</key>
-      <value></value>
-    </param>
-    <param>
-      <key>_enabled</key>
-      <value>True</value>
-    </param>
-    <param>
-      <key>_coordinate</key>
-      <value>(688, 220)</value>
-    </param>
-    <param>
-      <key>_rotation</key>
-      <value>0</value>
-    </param>
-    <param>
-      <key>id</key>
-      <value>wavelearner_terminal_sink_0</value>
-    </param>
-    <param>
-      <key>input_vlen</key>
-      <value>output_len*batch_size</value>
     </param>
   </block>
   <connection>
@@ -608,7 +576,7 @@
   </connection>
   <connection>
     <source_block_id>inference</source_block_id>
-    <sink_block_id>wavelearner_terminal_sink_0</sink_block_id>
+    <sink_block_id>blocks_file_sink_0</sink_block_id>
     <source_key>0</source_key>
     <sink_key>0</sink_key>
   </connection>
