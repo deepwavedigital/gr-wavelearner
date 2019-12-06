@@ -228,17 +228,14 @@ size_t inference_impl::get_gr_buffer_size(const size_t vlen, const bool is_compl
 
 size_t inference_impl::get_trt_binding_size(const nvinfer1::Dims& dims)
     const noexcept {
-  // We start with the batch size, since this is NOT provided via the dims
-  // parameter and we need to account for this dimension.
-  size_t num_floats = batch_size_;
+  // Count total number of elements in the N-dimensional tensor
+  size_t count = 1;
   for (int i = 0; i < dims.nbDims; ++i) {
-    const auto type = dims.type[i];
-    if ((type == nvinfer1::DimensionType::kSPATIAL) ||
-        (type == nvinfer1::DimensionType::kCHANNEL)) {
-        num_floats *= dims.d[i];
-    }
+    count *= dims.d[i];
   }
-  return num_floats * sizeof(float);
+  // Account for batch size and convert to number of bytes based on
+  // all inputs and outputs to TRT being FP32.
+  return count * batch_size_ * sizeof(float);
 }
 
 void inference_impl::print_performance_metrics() const noexcept {
