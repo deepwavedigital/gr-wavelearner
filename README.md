@@ -3,7 +3,7 @@ Incorporate Deep Learning into GNU Radio
 
 ### Author
 <p align="center">
-<img src="http://www.deepwavedigital.net/logos/deepwave-logo-2-white.png" Width="50%" />
+<img src="https://deepwavedigital.com/media/images/dwd2_crop_transparent.png" Width="50%" />
 </p>
 
 This software is written by **Deepwave Digital, Inc.** [www.deepwavedigital.com]().
@@ -11,8 +11,7 @@ This software is written by **Deepwave Digital, Inc.** [www.deepwavedigital.com]
 
 &nbsp;
 ### Inquiries
-  - General company contact: [info@deepwavedigital.com](mailto:info@deepwavedigital.com)
-  - Bugs/issues/requests contact: [support@deepwavedigital.com](mailto:support@deepwavedigital.com)
+  - General company contact: [https://deepwavedigital.com/inquiry](https://deepwavedigital.com/inquiry/)
 
 &nbsp;
 ### Description
@@ -21,7 +20,7 @@ This out of tree (OOT) module for GNU Radio contains code to provide an interfac
 flowgraph. TensorRT allows for deep learning networks to be optimized for inference operations on an
 NVIDIA graphics processing units (GPU).
 
-For an example of how to use GR-Wavelearner, see our presentation [here](http://www.deepwavedigital.net/slides/GR-Wavelearner_Overview.pdf).
+For an example of how to use GR-Wavelearner, see our presentation [here](http://deepwavedigital.com/media/2019/GR-Wavelearner_Overview.pdf).
 
 &nbsp;
 ### Dependencies:     
@@ -138,19 +137,19 @@ For an example of how to use GR-Wavelearner, see our presentation [here](http://
 ## Screen Shots
 #### Example Flow Graph of Deep Learning Classifier
 <p align="center">
-<img src="http://www.deepwavedigital.net/images/classifier_test.png" Width="50%" />
+<img src="https://deepwavedigital.com/media/2019/classifier_test.png" Width="50%" />
 </p>
 
 &nbsp;
 #### Inference Block
 <p align="center">
-<img src="http://www.deepwavedigital.net/images/inference_block.png" Width="25%" />
+<img src="https://deepwavedigital.com/media/2019/inference_block.png" Width="25%" />
 </p>
 
 &nbsp;
 #### Terminal Sink Block
 <p align="center">
-<img src="http://www.deepwavedigital.net/images/terminal_sink_block.png" Width="25%" />
+<img src="https://deepwavedigital.com/media/2019/terminal_sink_block.png" Width="25%" />
 </p>
 
 
