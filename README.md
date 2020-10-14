@@ -6,7 +6,7 @@ Incorporate Deep Learning into GNU Radio
 <img src="https://deepwavedigital.com/media/images/dwd2_crop_transparent.png" Width="50%" />
 </p>
 
-This software is written by **Deepwave Digital, Inc.** [www.deepwavedigital.com]().
+This software is written by [https://www.deepwavedigital.com](**Deepwave Digital, Inc.**).
 
 
 &nbsp;
@@ -268,7 +268,7 @@ AIR-T, Jetson, NVIDIA, GNU Radio
 
 &nbsp;
 ### Credits and License
-GR-WAVELEARNER is designed and written by **Deepwave Digital, Inc.** [www.deepwavedigital.com]()
+GR-WAVELEARNER is designed and written by [https://www.deepwavedigital.com]( **Deepwave Digital, Inc.**)
 and is licensed under the GNU General Public License. Copyright notices at the top of source files.
 
 
