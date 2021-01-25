@@ -162,8 +162,6 @@ cudaError inference_impl::validate_engine() {
   if (batch_size_ > max_batch_size) {
     trt_logger_.log_error("Unsupported batch size detected.");
     return cudaErrorInvalidValue;
-  } else if (batch_size_ != max_batch_size) {
-    trt_logger_.log_warn("Unoptimized batch size detected.");
   }
 
   for (int i = 0; i < kNumIOPorts; ++i) {
