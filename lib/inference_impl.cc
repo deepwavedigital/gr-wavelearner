@@ -56,6 +56,7 @@ inference_impl::inference_impl(const std::string& plan_filepath,
       input_buffer_size_(get_gr_buffer_size(input_vlen, complex_input)),
       output_buffer_size_(get_gr_buffer_size(output_vlen)),
       batch_size_(batch_size),
+      explicit_batch_size_(false),
       total_signal_segments_processed_(0),
       total_work_time_(std::chrono::seconds::zero()),
       trt_logger_(),
@@ -201,6 +202,7 @@ cudaError inference_impl::validate_engine() {
     trt_logger_.log_error("Input size mismatch detected.");
     return cudaErrorInvalidValue;
   }
+
   const nvinfer1::Dims output_dims =
     engine_->getBindingDimensions(output_binding_index_);
   if (get_trt_binding_size(output_dims) != output_buffer_size_) {
@@ -213,6 +215,21 @@ cudaError inference_impl::validate_engine() {
   if (infer_context_ == nullptr) {
     trt_logger_.log_error("Unable to create TensorRT execution context.");
     return cudaErrorInitializationError;
+  }
+
+  // Handle the case of a PLAN that is expecting an explicit batch size (common
+  // case for PLAN files generated from ONNX files). If we are using an explicit
+  // batch size, we need to set the input binding dimensions accordingly.
+  if (input_dims.d[0] == -1) {
+    explicit_batch_size_ = true;
+    nvinfer1::Dims new_input_dims(input_dims);
+    new_input_dims.d[0] = batch_size_;
+    const bool resize_success =
+      infer_context_->setBindingDimensions(input_binding_index_, new_input_dims);
+    if (!resize_success) {
+      trt_logger_.log_error("Failed to resize input binding.");
+      return cudaErrorInitializationError;
+    }
   }
 
   return cudaSuccess;
@@ -228,14 +245,10 @@ size_t inference_impl::get_gr_buffer_size(const size_t vlen, const bool is_compl
 
 size_t inference_impl::get_trt_binding_size(const nvinfer1::Dims& dims)
     const noexcept {
-  // Count total number of elements in the N-dimensional tensor
-  size_t count = 1;
-  for (int i = 0; i < dims.nbDims; ++i) {
-    count *= dims.d[i];
-  }
-  // Account for batch size and convert to number of bytes based on
-  // all inputs and outputs to TRT being FP32.
-  return count * batch_size_ * sizeof(float);
+  size_t count = batch_size_;  // total # of elements in the N-dim tensor
+  // Skip over the first index (batch size) since it's already accounted for.
+  for (int i = 1; i < dims.nbDims; ++i) count *= dims.d[i];
+  return count * sizeof(float);  // convert to bytes
 }
 
 void inference_impl::print_performance_metrics() const noexcept {
@@ -275,11 +288,14 @@ int inference_impl::work(int noutput_items,
                                      "push context");
   std::memcpy(buffers_[input_binding_index_], in, input_buffer_size_);
 
-  if (!infer_context_->execute(batch_size_,
-                               reinterpret_cast<void**>(buffers_))) {
-    err_handler_.throw_on_cuda_rt_err(cudaErrorLaunchFailure,
-                                      "execute inference");
-  }
+  bool infer_success = false;
+  void** buffs = reinterpret_cast<void**>(buffers_);
+  if (explicit_batch_size_)
+    infer_success = infer_context_->executeV2(buffs);
+  else
+    infer_success = infer_context_->execute(batch_size_, buffs);
+  if (!infer_success)
+    err_handler_.throw_on_cuda_rt_err(cudaErrorLaunchFailure, "run inference");
 
   std::memcpy(out, buffers_[output_binding_index_], output_buffer_size_);
   err_handler_.throw_on_cuda_drv_err(cuCtxPopCurrent(&context_),
