@@ -1,6 +1,6 @@
 /* -*- c++ -*- */
 /* 
- * Copyright 2018-2019 Deepwave Digital Inc.
+ * Copyright 2018-2021 Deepwave Digital Inc.
  * 
  * This is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -56,6 +56,7 @@ class inference_impl : public inference {
   size_t input_buffer_size_;
   size_t output_buffer_size_;
   size_t batch_size_;
+  bool explicit_batch_size_;
   // A note on terminology: a "signal segment" is a single set of digital
   // samples that are processed together to give some inference output. In image
   // processing, this is akin to an image, where you may have multiple images in
