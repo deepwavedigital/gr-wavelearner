@@ -1,0 +1,63 @@
+id: wavelearner_inference
+label: Inference
+category: '[Wavelearner]'
+
+templates:
+  imports: import wavelearner
+  make: wavelearner.inference(${plan_filepath}, ${cplx_input}, ${input_vlen}, ${output_vlen}, ${batch_size})
+
+parameters:
+- id: plan_filepath
+  label: PLAN File
+  dtype: file_open
+  default: ""
+
+- id: cplx_input
+  label: Input Type
+  dtype: enum
+  default: "'Complex'"
+  options: ['True', 'False']
+  option_labels: ['Complex', 'Float'] 
+
+- id: input_vlen
+  label: Input Vector Length
+  dtype: int
+  default: 0
+
+- id: output_vlen
+  label: Output Vector Length
+  dtype: int
+  default: 0
+
+- id: batch_size
+  label: Batch Size
+  dtype: int
+  default: 1
+
+asserts:
+- ${input_vlen > 0}
+- ${output_vlen > 0}
+- ${batch_size > 0}
+
+inputs:
+- domain: stream
+  dtype: ${complex if cplx_input else float}
+  vlen: ${input_vlen}
+
+outputs:
+- domain: stream
+  dtype: float
+  vlen: ${output_vlen}
+
+documentation: |-
+  Block that performs inference using the provided TensorRT PLAN file.
+    Args:
+      plan_filepath: Path to the PLAN file.
+      input_type: Determines if the input samples are complex or not. In the case of complex samples, an implicit conversion is done to interleaved floats (i.e., it is expected that for each sample the real and imaginary component are next to one another in adjacent memory), since TensorRT has no concept of complex data types.
+      input_vlen: Number of input samples for each batch. To get this number, combine all NCHW dimensions (including batch size) by multiplying them together. For example, a 16x1x2x2048 batch would have an input_vlen of 65536. Note that in the case of complex samples, your input dimensions will be twice as large as the input_vlen, since there are two floats for each sample.
+      output_vlen: Same as input_vlen, except for the output.
+      batch_size: Batch size to be used for inference.
+
+#  'file_format' specifies the version of the GRC yml format used in the file
+#  and should usually not be changed.
+file_format: 1
