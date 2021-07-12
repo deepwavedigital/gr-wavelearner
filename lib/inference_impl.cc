@@ -1,26 +1,9 @@
 /* -*- c++ -*- */
-/* 
+/*
  * Copyright 2018-2021 Deepwave Digital Inc.
- * 
- * This is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation; either version 3, or (at your option)
- * any later version.
- * 
- * This software is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- * 
- * You should have received a copy of the GNU General Public License
- * along with this software; see the file COPYING.  If not, write to
- * the Free Software Foundation, Inc., 51 Franklin Street,
- * Boston, MA 02110-1301, USA.
+ *
+ * SPDX-License-Identifier: GPL-3.0-or-later
  */
-
-#ifdef HAVE_CONFIG_H
-#include "config.h"
-#endif
 
 #include "inference_impl.h"
 #include <cstring>
@@ -36,9 +19,8 @@ inference::sptr inference::make(const std::string& plan_filepath,
                                 const size_t input_vlen,
                                 const size_t output_vlen,
                                 const size_t batch_size) {
-  return gnuradio::get_initial_sptr(
-      new inference_impl(plan_filepath, complex_input, input_vlen,
-                         output_vlen, batch_size));
+  return gnuradio::make_block_sptr<inference_impl>(
+      plan_filepath, complex_input, input_vlen, output_vlen, batch_size);
 }
 
 inference_impl::inference_impl(const std::string& plan_filepath,
