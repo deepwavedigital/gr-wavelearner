@@ -1,0 +1,51 @@
+{% set name = "gr-wavelearner" %}
+{% set version = environ.get('GIT_DESCRIBE_TAG', 'untagged')|string|replace('-','_') %}
+{% set build_number = environ.get('GIT_DESCRIBE_NUMBER', '0') %}
+
+package:
+  name: {{ name|lower }}
+  version: {{ version }}
+
+source:
+  git_url: {{ environ.get('FEEDSTOCK_ROOT', '..') }}
+
+build:
+  number: {{ build_number }}
+  string: {{ [build_number, environ.get('GIT_DESCRIBE_HASH', '')] | join('_') }}
+
+requirements:
+  build:
+    - {{ compiler('c') }}
+    - {{ compiler('cxx') }}
+    - bzip2  # [not win]
+    - cmake
+    - ninja
+    - pkg-config  # [not win]
+    # cross-compilation requirements
+    - python                              # [build_platform != target_platform]
+    - cross-python_{{ target_platform }}  # [build_platform != target_platform]
+    - numpy                               # [build_platform != target_platform]
+    - pybind11                            # [build_platform != target_platform]
+
+  host:
+    - boost-cpp
+    - gnuradio-core
+    - pybind11
+    - python
+    - numpy
+    - volk
+
+  run:
+    - construct >=2.9
+    - gnuradio-zeromq
+    - matplotlib-base
+    - numpy
+    - python
+    - pyyaml
+    - requests
+
+about:
+  home: https://github.com/deepwavedigital/gr-wavelearner
+  license: GPL-3
+  license_family: GPL
+  license_file: COPYING
