@@ -9,7 +9,7 @@
 ########################################################################
 # Find CUDA and TensorRT libraries
 ########################################################################
-find_package(CUDA REQUIRED)
+find_package(CUDAToolkit REQUIRED)
 find_package(TensorRT REQUIRED)
 
 ########################################################################
@@ -32,15 +32,15 @@ endif(NOT wavelearner_sources)
 add_library(gnuradio-wavelearner SHARED ${wavelearner_sources})
 target_link_libraries(gnuradio-wavelearner
                       gnuradio::gnuradio-runtime
+                      CUDA::toolkit
+                      CUDA::cudart
+                      CUDA::cufft
                       ${TensorRT_LIBRARY}
-                      ${CUDA_CUDA_LIBRARY}   # CUDA Driver API
-                      ${CUDA_CUDART_LIBRARY} # CUDA Runtime API
-                      ${CUDA_CUFFT_LIBRARIES}
   )
 target_include_directories(gnuradio-wavelearner
     PUBLIC $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/../include>
     PUBLIC $<INSTALL_INTERFACE:include>
-    ${CUDA_INCLUDE_DIRS}
+    ${CUDAToolkit_INCLUDE_DIRS}
     ${TensorRT_INCLUDE_DIRS}
   )
 set_target_properties(gnuradio-wavelearner PROPERTIES DEFINE_SYMBOL "gnuradio_wavelearner_EXPORTS")
