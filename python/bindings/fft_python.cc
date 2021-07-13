@@ -34,6 +34,9 @@ void bind_fft(py::module& m)
 
 
     py::class_<fft,
+        gr::sync_block,
+        gr::block,
+        gr::basic_block,
         std::shared_ptr<fft>>(m, "fft", D(fft))
 
         .def(py::init(&fft::make),

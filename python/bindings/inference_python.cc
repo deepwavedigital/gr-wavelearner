@@ -34,6 +34,9 @@ void bind_inference(py::module& m)
 
 
     py::class_<inference,
+        gr::sync_block,
+        gr::block,
+        gr::basic_block,
         std::shared_ptr<inference>>(m, "inference", D(inference))
 
         .def(py::init(&inference::make),
