@@ -56,14 +56,24 @@ set(_TensorRT_SEARCH_NORMAL
 )
 list(APPEND _TensorRT_SEARCHES _TensorRT_SEARCH_NORMAL)
 
+if(UNIX)
+  if(CMAKE_SYSTEM_PROCESSOR MATCHES "aarch64")
+    set(_TensorRT_TARGET_TRIPLE "aarch64-linux-gnu")
+  else()
+    set(_TensorRT_TARGET_TRIPLE "x86_64-pc-linux-gnu")
+  endif()
+else()
+  set(_TensorRT_TARGET_TRIPLE "")
+endif()
+
 # Include dir
 foreach(search ${_TensorRT_SEARCHES})
-  find_path(TensorRT_INCLUDE_DIR NAMES NvInfer.h ${${search}} PATH_SUFFIXES include)
+  find_path(TensorRT_INCLUDE_DIR NAMES NvInfer.h ${${search}} PATH_SUFFIXES include include/${_TensorRT_TARGET_TRIPLE})
 endforeach()
 
 if(NOT TensorRT_LIBRARY)
   foreach(search ${_TensorRT_SEARCHES})
-    find_library(TensorRT_LIBRARY NAMES nvinfer ${${search}} PATH_SUFFIXES lib)
+    find_library(TensorRT_LIBRARY NAMES nvinfer ${${search}} PATH_SUFFIXES lib lib/${_TensorRT_TARGET_TRIPLE})
   endforeach()
 endif()
 
