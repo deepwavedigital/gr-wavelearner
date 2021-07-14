@@ -49,6 +49,7 @@ add_library(gnuradio-wavelearner SHARED ${wavelearner_sources})
 target_link_libraries(gnuradio-wavelearner
                       gnuradio::gnuradio-runtime
                       CUDA::toolkit
+                      CUDA::cuda_driver
                       CUDA::cudart
                       CUDA::cufft
                       ${TensorRT_LIBRARY}
