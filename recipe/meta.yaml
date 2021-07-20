@@ -19,6 +19,9 @@ build:
     - '*/libcufft.so.10'    # [ aarch64 ]
     - '*/libcudart.so.10.2' # [ aarch64 ]
     - '*/libnvinfer.so.7'   # [ aarch64 ]
+  ignore_run_exports:
+    - numpy
+    - python
 
 requirements:
   build:
