@@ -55,10 +55,14 @@ target_link_libraries(gnuradio-wavelearner
                       ${TensorRT_LIBRARY}
   )
 target_include_directories(gnuradio-wavelearner
-    PUBLIC $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/../include>
-    PUBLIC $<INSTALL_INTERFACE:include>
-    $<BUILD_INTERFACE:${CUDAToolkit_INCLUDE_DIRS}>
-    $<BUILD_INTERFACE:${TensorRT_INCLUDE_DIRS}>
+    PUBLIC
+        $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/../include>
+        $<INSTALL_INTERFACE:include>
+  )
+target_include_directories(gnuradio-wavelearner
+    SYSTEM PUBLIC
+        $<BUILD_INTERFACE:${CUDAToolkit_INCLUDE_DIRS}>
+        $<BUILD_INTERFACE:${TensorRT_INCLUDE_DIRS}>
   )
 set_target_properties(gnuradio-wavelearner PROPERTIES DEFINE_SYMBOL "gnuradio_wavelearner_EXPORTS")
 
