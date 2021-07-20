@@ -15,6 +15,7 @@ build:
   missing_dso_whitelist:
     # Don't error about linking against system CUDA and TensorRT packages
     # on aarch64. These aren't conda-packaged on aarch64/L4T.
+    - '*/libcuda.so.1'      # [ aarch64 ]
     - '*/libcufft.so.10'    # [ aarch64 ]
     - '*/libcudart.so.10.2' # [ aarch64 ]
     - '*/libnvinfer.so.7'   # [ aarch64 ]
