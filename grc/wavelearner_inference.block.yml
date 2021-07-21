@@ -4,7 +4,7 @@ category: '[Wavelearner]'
 
 templates:
   imports: import wavelearner
-  make: wavelearner.inference(${plan_filepath}, ${cplx_input}, ${input_vlen}, ${output_vlen}, ${batch_size})
+  make: wavelearner.inference(${plan_filepath}, ${input_type.is_complex}, ${input_vlen}, ${output_vlen}, ${batch_size})
 
 parameters:
 - id: plan_filepath
@@ -12,12 +12,14 @@ parameters:
   dtype: file_open
   default: ""
 
-- id: cplx_input
+- id: input_type
   label: Input Type
   dtype: enum
-  default: "'Complex'"
-  options: ['True', 'False']
-  option_labels: ['Complex', 'Float'] 
+  default: 'Complex'
+  options: [complex, float]
+  option_labels: ['Complex', 'Float']
+  option_attributes:
+    is_complex: ['True', 'False']
 
 - id: input_vlen
   label: Input Vector Length
@@ -41,7 +43,7 @@ asserts:
 
 inputs:
 - domain: stream
-  dtype: ${complex if cplx_input else float}
+  dtype: ${input_type}
   vlen: ${input_vlen}
 
 outputs:
