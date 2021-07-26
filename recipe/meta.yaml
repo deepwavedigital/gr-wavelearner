@@ -1,6 +1,7 @@
 {% set name = "gr-wavelearner" %}
-{% set version = environ.get('GIT_DESCRIBE_TAG', 'untagged')|string|replace('-','_') %}
+{% set git_tag = environ.get('GIT_DESCRIBE_TAG', 'untagged')|string|replace('-','_') %}
 {% set build_number = environ.get('GIT_DESCRIBE_NUMBER', '0') %}
+{% set version = [git_tag, build_number, environ.get('GIT_DESCRIBE_HASH', '')] | join('_') %}
 
 package:
   name: {{ name|lower }}
@@ -11,7 +12,6 @@ source:
 
 build:
   number: {{ build_number }}
-  string: {{ [build_number, environ.get('GIT_DESCRIBE_HASH', '')] | join('_') }}
   missing_dso_whitelist:
     # Don't error about linking against system CUDA and TensorRT packages
     # on aarch64. These aren't conda-packaged on aarch64/L4T.
@@ -39,19 +39,19 @@ requirements:
 
   host:
     - boost-cpp
-    - gnuradio-core
+    - gnuradio-core {{ gnuradio }}.*
     - pybind11
-    - python
+    - python {{ python }}
     - numpy
 
   run:
     - boost-cpp
     - construct >=2.9
     - gmp
-    - gnuradio-zeromq
+    - gnuradio-core {{ gnuradio }}.*
     - matplotlib-base
     - numpy
-    - python
+    - python {{ python }}
     - pyyaml
     - requests
 
