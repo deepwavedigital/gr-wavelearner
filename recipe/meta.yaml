@@ -39,7 +39,7 @@ requirements:
 
   host:
     - boost-cpp
-    - gnuradio-core {{ gnuradio }}.*
+    - gnuradio-core {{ gnuradio }}
     - pybind11
     - python {{ python }}
     - numpy
@@ -48,7 +48,7 @@ requirements:
     - boost-cpp
     - construct >=2.9
     - gmp
-    - gnuradio-core {{ gnuradio }}.*
+    - gnuradio-core {{ gnuradio }}
     - matplotlib-base
     - numpy
     - python {{ python }}
