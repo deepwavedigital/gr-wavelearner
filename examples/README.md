@@ -15,6 +15,8 @@ This folder contains an example of how to use the gr-wavelearner package.
 3. Open the **Inference Block** and select the `.plan` file created in Step 1.
 4. Execute the GRC flowgraph
 
+Note that the examples utilize a SoapyAIRT source block. However, these examples can be tailored to any type of SDR by simply swapping the source block with the appropriate block for your hardware.
+
 
 
 Copyright 2018-2021 Deepwave Digital Inc.
