@@ -119,8 +119,7 @@ cudaError inference_impl::load_engine(const std::string& plan_filepath) {
   const std::string serialized_engine = plan_buffer.str();
   plan_file.close();
   engine_ = infer_runtime_->deserializeCudaEngine(serialized_engine.data(),
-                                                  serialized_engine.size(),
-                                                  nullptr);
+                                                  serialized_engine.size());
   if (engine_ == nullptr) {
     trt_logger_.log_error("Failed to deserialize engine.");
     return cudaErrorInitializationError;
