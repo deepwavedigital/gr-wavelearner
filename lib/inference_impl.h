@@ -10,6 +10,7 @@
 
 #include <wavelearner/inference.h>
 #include <chrono>
+#include <memory>
 #include <string>
 #include <cuda.h>
 #include <cuda_runtime_api.h>
@@ -34,9 +35,9 @@ class inference_impl : public inference {
   static constexpr int kNumIOPorts = 2;
   static constexpr int kInvalidBindingIndex = -1;
   CUcontext context_;
-  nvinfer1::IRuntime* infer_runtime_;
-  nvinfer1::ICudaEngine* engine_;
-  nvinfer1::IExecutionContext* infer_context_;
+  std::unique_ptr<nvinfer1::IRuntime> infer_runtime_;
+  std::unique_ptr<nvinfer1::ICudaEngine> engine_;
+  std::unique_ptr<nvinfer1::IExecutionContext> infer_context_;
   float* buffers_[kNumIOPorts];
   int input_binding_index_;
   int output_binding_index_;

@@ -80,24 +80,12 @@ inference_impl::~inference_impl() {
       buffers_[i] = nullptr;
     }
   }
-  if (infer_context_ != nullptr) {
-    infer_context_->destroy();
-    infer_context_ = nullptr;
-  }
-  if (engine_ != nullptr) {
-    engine_->destroy();
-    engine_ = nullptr;
-  }
-  if (infer_runtime_ != nullptr) {
-    infer_runtime_->destroy();
-    infer_runtime_ = nullptr;
-  }
   cuCtxDestroy(context_);
 }
 
 cudaError inference_impl::load_engine(const std::string& plan_filepath) {
-  infer_runtime_ = nvinfer1::createInferRuntime(trt_logger_);
-  if (infer_runtime_ == nullptr) {
+  infer_runtime_.reset(nvinfer1::createInferRuntime(trt_logger_));
+  if (!infer_runtime_) {
     trt_logger_.log_error("Failed to create inference runtime.");
     return cudaErrorStartupFailure;
   }
@@ -118,9 +106,9 @@ cudaError inference_impl::load_engine(const std::string& plan_filepath) {
 
   const std::string serialized_engine = plan_buffer.str();
   plan_file.close();
-  engine_ = infer_runtime_->deserializeCudaEngine(serialized_engine.data(),
-                                                  serialized_engine.size());
-  if (engine_ == nullptr) {
+  engine_.reset(infer_runtime_->deserializeCudaEngine(serialized_engine.data(),
+                                                      serialized_engine.size()));
+  if (!engine_) {
     trt_logger_.log_error("Failed to deserialize engine.");
     return cudaErrorInitializationError;
   }
@@ -129,7 +117,7 @@ cudaError inference_impl::load_engine(const std::string& plan_filepath) {
 }
 
 cudaError inference_impl::validate_engine() {
-  if (engine_ == nullptr) {
+  if (!engine_) {
     trt_logger_.log_error("Attempted to validate NULL engine.");
     return cudaErrorInitializationError;
   }
@@ -190,8 +178,8 @@ cudaError inference_impl::validate_engine() {
   }
 
   // If everything checks out, we build the execution context.
-  infer_context_ = engine_->createExecutionContext();
-  if (infer_context_ == nullptr) {
+  infer_context_.reset(engine_->createExecutionContext());
+  if (!infer_context_) {
     trt_logger_.log_error("Unable to create TensorRT execution context.");
     return cudaErrorInitializationError;
   }
