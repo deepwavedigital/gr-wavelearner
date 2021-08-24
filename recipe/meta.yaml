@@ -51,6 +51,10 @@ requirements:
     - pyyaml
     - requests
 
+  test:
+    imports:
+      - wavelearner
+
 about:
   home: https://github.com/deepwavedigital/gr-wavelearner
   license: GPL-3
