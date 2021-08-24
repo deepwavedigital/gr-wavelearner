@@ -12,20 +12,23 @@ cmake_minimum_required(VERSION 3.17)
 # Find CUDA and TensorRT libraries
 ########################################################################
 
+# CUDA is not packaged for conda on aarch64. So we need some special
+# configuration to allow cmake to find host system libraries. TensorRT
+# is not packaged for conda on any architecture yet.
+set(_old_path_mode_inc ${CMAKE_FIND_ROOT_PATH_MODE_INCLUDE})
+set(_old_path_mode_lib ${CMAKE_FIND_ROOT_PATH_MODE_LIBRARY})
+set(CMAKE_FIND_ROOT_PATH_MODE_INCLUDE BOTH)
+set(CMAKE_FIND_ROOT_PATH_MODE_LIBRARY BOTH)
 if(UNIX AND CMAKE_SYSTEM_PROCESSOR MATCHES "aarch64")
-    # CUDA is not packaged for conda on aarch64. So we need some special
-    # configuration to allow cmake to find host system libraries.
-    set(_old_path_mode_inc ${CMAKE_FIND_ROOT_PATH_MODE_INCLUDE})
-    set(_old_path_mode_lib ${CMAKE_FIND_ROOT_PATH_MODE_LIBRARY})
-    set(CMAKE_FIND_ROOT_PATH_MODE_INCLUDE BOTH)
-    set(CMAKE_FIND_ROOT_PATH_MODE_LIBRARY BOTH)
     find_package(CUDAToolkit REQUIRED)
     find_package(TensorRT REQUIRED)
     set(CMAKE_FIND_ROOT_PATH_MODE_INCLUDE ${_old_path_mode_inc})
     set(CMAKE_FIND_ROOT_PATH_MODE_LIBRARY ${_old_path_mode_lib})
 else()
-    find_package(CUDAToolkit REQUIRED)
     find_package(TensorRT REQUIRED)
+    set(CMAKE_FIND_ROOT_PATH_MODE_INCLUDE ${_old_path_mode_inc})
+    set(CMAKE_FIND_ROOT_PATH_MODE_LIBRARY ${_old_path_mode_lib})
+    find_package(CUDAToolkit REQUIRED)
 endif()
 
 ########################################################################

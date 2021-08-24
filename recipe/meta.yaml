@@ -31,11 +31,6 @@ requirements:
     - cmake
     - ninja
     - pkg-config  # [not win]
-    # cross-compilation requirements
-    - python                              # [build_platform != target_platform]
-    - cross-python_{{ target_platform }}  # [build_platform != target_platform]
-    - numpy                               # [build_platform != target_platform]
-    - pybind11                            # [build_platform != target_platform]
 
   host:
     - boost-cpp
@@ -43,6 +38,7 @@ requirements:
     - pybind11
     - python {{ python }}
     - numpy
+    - cudatoolkit  # [ not aarch64 ]
 
   run:
     - boost-cpp
