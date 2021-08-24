@@ -31,6 +31,7 @@ requirements:
     - cmake
     - ninja
     - pkg-config  # [not win]
+    - gnuradio-build-deps {{ gnuradio }}
 
   host:
     - boost-cpp
