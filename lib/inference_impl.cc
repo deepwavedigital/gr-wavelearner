@@ -80,6 +80,9 @@ inference_impl::~inference_impl() {
       buffers_[i] = nullptr;
     }
   }
+  infer_context_.reset(nullptr);
+  engine_.reset(nullptr);
+  infer_runtime_.reset(nullptr);
   cuCtxDestroy(context_);
 }
 
