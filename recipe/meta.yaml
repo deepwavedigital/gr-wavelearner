@@ -1,0 +1,63 @@
+{% set name = "gr-wavelearner" %}
+{% set git_tag = environ.get('GIT_DESCRIBE_TAG', 'untagged')|string|replace('-','_') %}
+{% set build_number = environ.get('GIT_DESCRIBE_NUMBER', '0') %}
+{% set version = [git_tag, build_number, environ.get('GIT_DESCRIBE_HASH', '')] | join('_') %}
+
+package:
+  name: {{ name|lower }}
+  version: {{ version }}
+
+source:
+  git_url: {{ environ.get('FEEDSTOCK_ROOT', '..') }}
+
+build:
+  number: {{ build_number }}
+  missing_dso_whitelist:
+    # Don't error about linking against system CUDA and TensorRT packages
+    # on aarch64. These aren't conda-packaged on aarch64/L4T.
+    - '*/libcuda.so.1'      # [ aarch64 ]
+    - '*/libcufft.so.10'    # [ aarch64 ]
+    - '*/libcudart.so.10.2' # [ aarch64 ]
+    - '*/libnvinfer.so.7'   # [ aarch64 ]
+  ignore_run_exports:
+    - numpy
+    - python
+
+requirements:
+  build:
+    - {{ compiler('c') }}
+    - {{ compiler('cxx') }}
+    - bzip2  # [not win]
+    - cmake
+    - ninja
+    - pkg-config  # [not win]
+    - gnuradio-build-deps {{ gnuradio }}
+
+  host:
+    - boost-cpp
+    - gnuradio-core {{ gnuradio }}
+    - pybind11
+    - python {{ python }}
+    - numpy
+    - cudatoolkit  # [ not aarch64 ]
+
+  run:
+    - boost-cpp
+    - construct >=2.9
+    - gmp
+    - gnuradio-core {{ gnuradio }}
+    - matplotlib-base
+    - numpy
+    - python {{ python }}
+    - pyyaml
+    - requests
+
+  test:
+    imports:
+      - wavelearner
+
+about:
+  home: https://github.com/deepwavedigital/gr-wavelearner
+  license: GPL-3
+  license_family: GPL
+  license_file: COPYING

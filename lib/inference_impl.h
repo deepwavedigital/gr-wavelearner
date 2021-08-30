@@ -1,21 +1,8 @@
 /* -*- c++ -*- */
-/* 
+/*
  * Copyright 2018-2021 Deepwave Digital Inc.
- * 
- * This is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation; either version 3, or (at your option)
- * any later version.
- * 
- * This software is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- * 
- * You should have received a copy of the GNU General Public License
- * along with this software; see the file COPYING.  If not, write to
- * the Free Software Foundation, Inc., 51 Franklin Street,
- * Boston, MA 02110-1301, USA.
+ *
+ * SPDX-License-Identifier: GPL-3.0-or-later
  */
 
 #ifndef INCLUDED_WAVELEARNER_INFERENCE_IMPL_H
@@ -23,6 +10,7 @@
 
 #include <wavelearner/inference.h>
 #include <chrono>
+#include <memory>
 #include <string>
 #include <cuda.h>
 #include <cuda_runtime_api.h>
@@ -47,9 +35,9 @@ class inference_impl : public inference {
   static constexpr int kNumIOPorts = 2;
   static constexpr int kInvalidBindingIndex = -1;
   CUcontext context_;
-  nvinfer1::IRuntime* infer_runtime_;
-  nvinfer1::ICudaEngine* engine_;
-  nvinfer1::IExecutionContext* infer_context_;
+  std::unique_ptr<nvinfer1::IRuntime> infer_runtime_;
+  std::unique_ptr<nvinfer1::ICudaEngine> engine_;
+  std::unique_ptr<nvinfer1::IExecutionContext> infer_context_;
   float* buffers_[kNumIOPorts];
   int input_binding_index_;
   int output_binding_index_;

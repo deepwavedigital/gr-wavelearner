@@ -1,0 +1,52 @@
+id: wavelearner_fft
+label: FFT
+category: '[Wavelearner]'
+
+templates:
+  imports: import wavelearner
+  make: wavelearner.fft(${vlen}, ${fft_size}, ${forward_fft})
+
+parameters:
+- id: vlen
+  label: Vector Length
+  dtype: int
+  default: 131072
+
+- id: fft_size
+  label: FFT Size
+  dtype: int
+  default: 1024
+
+- id: forward_fft
+  label: Direction
+  dtype: enum
+  default: "'Forward'"
+  options: ['True', 'False']
+  option_labels: ['Forward', 'Inverse']
+
+asserts:
+- ${vlen > 0}
+- ${fft_size > 0}
+- ${vlen >= fft_size}
+- ${vlen % fft_size == 0}
+
+inputs:
+- domain: stream
+  dtype: complex
+  vlen: ${vlen}
+
+outputs:
+- domain: stream
+  dtype: complex
+  vlen: ${vlen}
+
+documentation: |-
+  Block that computes a FFT or IFFT using GPU acceleration.
+    Args:
+      vlen: Length of the input vector in samples. This is how many samples the GPU processes each time the FFT is executed. Note that this number is not necessarily the FFT size. That is, if this number is larger than the FFT size, then many smaller FFTs are batched together (i.e., computed in parallel). As a result, this number must be larger than or equal to the FFT size, and also must be a multiple of FFT size.
+      fft_size: Size of the FFT in samples. See "vlen" for a discussion on how these variables are related.
+      direction: Variable that determines whether this is a FFT or IFFT.
+
+#  'file_format' specifies the version of the GRC yml format used in the file
+#  and should usually not be changed.
+file_format: 1

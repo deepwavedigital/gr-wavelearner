@@ -1,26 +1,9 @@
 /* -*- c++ -*- */
-/* 
+/*
  * Copyright 2018-2021 Deepwave Digital Inc.
- * 
- * This is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation; either version 3, or (at your option)
- * any later version.
- * 
- * This software is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- * 
- * You should have received a copy of the GNU General Public License
- * along with this software; see the file COPYING.  If not, write to
- * the Free Software Foundation, Inc., 51 Franklin Street,
- * Boston, MA 02110-1301, USA.
+ *
+ * SPDX-License-Identifier: GPL-3.0-or-later
  */
-
-#ifdef HAVE_CONFIG_H
-#include "config.h"
-#endif
 
 #include "inference_impl.h"
 #include <cstring>
@@ -36,9 +19,8 @@ inference::sptr inference::make(const std::string& plan_filepath,
                                 const size_t input_vlen,
                                 const size_t output_vlen,
                                 const size_t batch_size) {
-  return gnuradio::get_initial_sptr(
-      new inference_impl(plan_filepath, complex_input, input_vlen,
-                         output_vlen, batch_size));
+  return gnuradio::make_block_sptr<inference_impl>(
+      plan_filepath, complex_input, input_vlen, output_vlen, batch_size);
 }
 
 inference_impl::inference_impl(const std::string& plan_filepath,
@@ -98,24 +80,15 @@ inference_impl::~inference_impl() {
       buffers_[i] = nullptr;
     }
   }
-  if (infer_context_ != nullptr) {
-    infer_context_->destroy();
-    infer_context_ = nullptr;
-  }
-  if (engine_ != nullptr) {
-    engine_->destroy();
-    engine_ = nullptr;
-  }
-  if (infer_runtime_ != nullptr) {
-    infer_runtime_->destroy();
-    infer_runtime_ = nullptr;
-  }
+  infer_context_.reset(nullptr);
+  engine_.reset(nullptr);
+  infer_runtime_.reset(nullptr);
   cuCtxDestroy(context_);
 }
 
 cudaError inference_impl::load_engine(const std::string& plan_filepath) {
-  infer_runtime_ = nvinfer1::createInferRuntime(trt_logger_);
-  if (infer_runtime_ == nullptr) {
+  infer_runtime_.reset(nvinfer1::createInferRuntime(trt_logger_));
+  if (!infer_runtime_) {
     trt_logger_.log_error("Failed to create inference runtime.");
     return cudaErrorStartupFailure;
   }
@@ -136,10 +109,9 @@ cudaError inference_impl::load_engine(const std::string& plan_filepath) {
 
   const std::string serialized_engine = plan_buffer.str();
   plan_file.close();
-  engine_ = infer_runtime_->deserializeCudaEngine(serialized_engine.data(),
-                                                  serialized_engine.size(),
-                                                  nullptr);
-  if (engine_ == nullptr) {
+  engine_.reset(infer_runtime_->deserializeCudaEngine(serialized_engine.data(),
+                                                      serialized_engine.size()));
+  if (!engine_) {
     trt_logger_.log_error("Failed to deserialize engine.");
     return cudaErrorInitializationError;
   }
@@ -148,7 +120,7 @@ cudaError inference_impl::load_engine(const std::string& plan_filepath) {
 }
 
 cudaError inference_impl::validate_engine() {
-  if (engine_ == nullptr) {
+  if (!engine_) {
     trt_logger_.log_error("Attempted to validate NULL engine.");
     return cudaErrorInitializationError;
   }
@@ -209,8 +181,8 @@ cudaError inference_impl::validate_engine() {
   }
 
   // If everything checks out, we build the execution context.
-  infer_context_ = engine_->createExecutionContext();
-  if (infer_context_ == nullptr) {
+  infer_context_.reset(engine_->createExecutionContext());
+  if (!infer_context_) {
     trt_logger_.log_error("Unable to create TensorRT execution context.");
     return cudaErrorInitializationError;
   }

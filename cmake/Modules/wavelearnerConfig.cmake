@@ -1,4 +1,6 @@
-INCLUDE(FindPkgConfig)
+if(NOT PKG_CONFIG_FOUND)
+    INCLUDE(FindPkgConfig)
+endif()
 PKG_CHECK_MODULES(PC_WAVELEARNER wavelearner)
 
 FIND_PATH(
@@ -22,9 +24,10 @@ FIND_LIBRARY(
           /usr/local/lib64
           /usr/lib
           /usr/lib64
-)
+          )
+
+include("${CMAKE_CURRENT_LIST_DIR}/wavelearnerTarget.cmake")
 
 INCLUDE(FindPackageHandleStandardArgs)
 FIND_PACKAGE_HANDLE_STANDARD_ARGS(WAVELEARNER DEFAULT_MSG WAVELEARNER_LIBRARIES WAVELEARNER_INCLUDE_DIRS)
 MARK_AS_ADVANCED(WAVELEARNER_LIBRARIES WAVELEARNER_INCLUDE_DIRS)
-
