@@ -3,11 +3,15 @@ This folder contains an example of how to use the gr-wavelearner package.
 
 ## Files:
 
+- gpu_fft_demo.grc: Executable GRC file demonstrating how to use the cuFFT block
 - classifier_test.grc: Executable GRC file demonstrating how to use gr-wavelearner package for
                        inference of a neural network
-- cuda_fft_demo.grc: Executable GRC file demonstrating how to use the cuFFT block
+                       
+## gpu_fft_demo Instructions:
 
-## Instructions:
+Please see the [tutorial](https://docs.deepwavedigital.com/Tutorials/3_cufft.html) that Deepwave has put together for this example.
+
+## classifier_test Instructions:
 
 1. Generate the PLAN file for your trained network. For examples on how to generate the PLAN file, see
 [here](https://github.com/deepwavedigital/airstack-examples/tree/master/python/inference)
