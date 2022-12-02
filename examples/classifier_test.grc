@@ -36,7 +36,7 @@ blocks:
   id: variable
   parameters:
     comment: ''
-    value: '256'
+    value: '128'
   states:
     bus_sink: false
     bus_source: false
@@ -72,7 +72,7 @@ blocks:
   id: variable
   parameters:
     comment: ''
-    value: '12'
+    value: '1'
   states:
     bus_sink: false
     bus_source: false
@@ -140,7 +140,7 @@ blocks:
     maxoutbuf: '0'
     minoutbuf: '0'
     output_vlen: output_len*batch_size
-    plan_filepath: saved_model.plan
+    plan_filepath: avg_pow_net.plan
   states:
     bus_sink: false
     bus_source: false
