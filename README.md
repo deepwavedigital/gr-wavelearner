@@ -158,7 +158,8 @@ For an example of how to use GR-Wavelearner, see our presentation [here](http://
 2. Export deep learning model to a ONNX file
 3. Using TensorRT, optimize the ONNX file into a PLAN engine file. Note that this stage must
    be performed on the system in which you are deploying your network. We provide an example
-   of how to convert a ONNX file to a PLAN file in `examples/onnx2plan.py`.
+   of how to convert a ONNX file to a PLAN file in `inference/onnx2plan.py` in
+   [airstack-examples](https://github.com/deepwavedigital/airstack-examples).
 4. Load .plan engine file into the `wavelearner.inference` block.
 5. Update the `batch_size`, `input_length`, and `output_length` to match that of your deep
    learning model.
