@@ -137,34 +137,32 @@ For an example of how to use GR-Wavelearner, see our presentation [here](http://
 ## Screen Shots
 #### Example Flow Graph of Deep Learning Classifier
 <p align="center">
-<img src="https://deepwavedigital.com/media/2019/classifier_test.png" Width="50%" />
+<img src="https://deepwavedigital.com/wp-content/uploads/2022/12/classifier_test_img.png" Width="50%" />
 </p>
 
 &nbsp;
 #### Inference Block
 <p align="center">
-<img src="https://deepwavedigital.com/media/2019/inference_block.png" Width="25%" />
+<img src="https://deepwavedigital.com/wp-content/uploads/2022/12/inference_block.png" Width="25%" />
 </p>
 
 &nbsp;
-#### Terminal Sink Block
+#### File Sink Block
 <p align="center">
-<img src="https://deepwavedigital.com/media/2019/terminal_sink_block.png" Width="25%" />
+<img src="https://deepwavedigital.com/wp-content/uploads/2022/12/file_sink.png" Width="25%" />
 </p>
-
 
 &nbsp;
 ### General Workflow for Creating Applications
 1. Train deep learning model (we suggest TensorFlow)
-2. Export deep learning model to a UFF file
-3. Using TensorRT, optimize the UFF file into a .plan engine file. Note that this stage must
+2. Export deep learning model to a ONNX file
+3. Using TensorRT, optimize the ONNX file into a PLAN engine file. Note that this stage must
    be performed on the system in which you are deploying your network. We provide an example
-   of how to convert a UFF file to a PLAN file in `examples/uff2plan.py`.
+   of how to convert a ONNX file to a PLAN file in `inference/onnx2plan.py` in
+   [airstack-examples](https://github.com/deepwavedigital/airstack-examples).
 4. Load .plan engine file into the `wavelearner.inference` block.
 5. Update the `batch_size`, `input_length`, and `output_length` to match that of your deep
    learning model.
-
-
 
 &nbsp;
 ### Troubleshooting
@@ -172,18 +170,14 @@ For an example of how to use GR-Wavelearner, see our presentation [here](http://
   will work with gr-wavelearner, but they have not been tested. We welcome any feedback on your
   successful builds.
 
-| Software  | Versions Tested | Application Notes
-| :---:     | :---:           | :---:               
-| Ubuntu    | 16.04           | 
-| Windows   | 10              | Tested with TensorRT 5.0
-| Jetpack   | 3.0, 3.3        | 
-| CUDA      | 9.0             |
-| cuDNN     | 7.2, 7.3        |
-| TensorRT  | 3.0, 4.0, 5.0   | 
-
-
-
-
+| Software  | Versions Tested |    Application Notes     |
+| :---:     |:---------------:|:------------------------:| 
+| Ubuntu    |      18.04      |                          |
+| Windows   |       10        | Tested with TensorRT 5.0 | 
+| Jetpack   |       4.6       |                          |
+| CUDA      |      10.2       |                          |
+| cuDNN     |       8.1       |                          |
+| TensorRT  |       8.0       |                          |
 
 - If you are having trouble building gr-wavelearner, the first thing to check is the installed
   version of the NVIDIA dependencies.
