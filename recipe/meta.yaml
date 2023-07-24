@@ -38,7 +38,7 @@ requirements:
     - gnuradio-core {{ gnuradio }}
     - pybind11
     - python {{ python }}
-    - numpy
+    - numpy {{ numpy }}
     - cudatoolkit  # [ not aarch64 ]
 
   run:
@@ -47,7 +47,7 @@ requirements:
     - gmp
     - gnuradio-core {{ gnuradio }}
     - matplotlib-base
-    - numpy
+    - numpy {{ numpy }}
     - python {{ python }}
     - pyyaml
     - requests

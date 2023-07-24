@@ -1,7 +1,23 @@
+# 1. Pair specific versions of python, numpy, and gnuradio together.
+#    This is required to workaround conda-forge dropping support
+#    for Python 3.6/3.7 in 2022.
+# 2. Build for GR 3.9.2 to support existing customers.
+#    Also build for latest GR 3.9.x that conda-forge supports
+#    for a given version of python.
 python:
     - 3.6
     - 3.7
     - 3.8
     - 3.9
 gnuradio:
-    - 3.9.2.0
+    - 3.9
+    - 3.9.2
+numpy:
+    - 1.19
+    - 1.19
+    - 1.20
+    - 1.20
+zip_keys:
+  -
+    - python
+    - numpy
