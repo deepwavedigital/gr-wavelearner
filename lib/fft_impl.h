@@ -29,6 +29,7 @@ class fft_impl : public fft {
   static constexpr auto kBlockName = "fft";
   size_t samples_per_buffer_;
   size_t buffer_size_;
+  size_t batch_size_;
   CUcontext context_;
   cudaStream_t stream_;
   cufftComplex* fft_data_;

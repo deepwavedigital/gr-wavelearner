@@ -29,8 +29,8 @@ fft_impl::fft_impl(const size_t vlen, const size_t fft_size,
       err_handler_(kBlockName),
       gr::sync_block(
           kBlockName,
-          gr::io_signature::make(1, 1, (sizeof(cufftComplex) * vlen)),
-          gr::io_signature::make(1, 1, (sizeof(cufftComplex) * vlen))) {
+          gr::io_signature::make(1, 1, (sizeof(cufftComplex) * fft_size)),
+          gr::io_signature::make(1, 1, (sizeof(cufftComplex) * fft_size))) {
   err_handler_.throw_on_cuda_drv_err(cuInit(0), "initialize CUDA driver API");
   CUdevice dev;
   err_handler_.throw_on_cuda_drv_err(cuDeviceGet(&dev, 0), "get CUDA device");
@@ -45,15 +45,16 @@ fft_impl::fft_impl(const size_t vlen, const size_t fft_size,
                     cudaHostAllocMapped),
       "allocate GPU buffer");
 
-  const size_t batch_size = samples_per_buffer_ / fft_size;
+  batch_size_ = samples_per_buffer_ / fft_size;
   err_handler_.throw_on_cufft_err(
-      cufftPlan1d(&fft_plan_, fft_size, CUFFT_C2C, batch_size),
+      cufftPlan1d(&fft_plan_, fft_size, CUFFT_C2C, batch_size_),
       "create FFT plan");
   err_handler_.throw_on_cufft_err(cufftSetStream(fft_plan_, stream_),
                                   "set FFT stream");
 
   err_handler_.throw_on_cuda_drv_err(cuCtxPopCurrent(&context_),
                                      "pop context during init");
+  set_output_multiple(batch_size_);
 }
 
 fft_impl::~fft_impl() {
@@ -72,8 +73,7 @@ int fft_impl::work(int noutput_items, gr_vector_const_void_star& input_items,
 
   err_handler_.throw_on_cuda_drv_err(cuCtxPushCurrent(context_),
                                      "push context");
-  for (int i = 0; i < noutput_items; ++i) {
-    const int buffer_index = i * samples_per_buffer_;
+  for (int i = 0, int buffer_index = 0; i < noutput_items / batch_size_; ++i, buffer_index += samples_per_buffer_) {
     std::memcpy(&fft_data_[0], &in[buffer_index], buffer_size_);
     err_handler_.throw_on_cufft_err(
         cufftExecC2C(fft_plan_, fft_data_, fft_data_, fft_direction_),
